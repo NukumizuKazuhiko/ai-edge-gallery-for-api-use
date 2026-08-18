@@ -18,12 +18,12 @@
 - ⚡ **多线程分片下载**：魔搭源下将文件分成 4 段并行 Range 下载，实测速度约 26 MB/s（单连接约 1.7 MB/s），大幅减少掉速波动，下载体验接近原生直连。
 - 📂 **导入本地模型**：点击首页右下角 `+` 按钮可从本机导入 `.litertlm` 格式的模型文件（仅支持该格式，其他格式会被拒绝）。导入后可编辑加速器（默认 GPU）、采样参数等，模型会出现在首页「Imported models」分组，并自动接入本地 API 服务的 `/v1/models` 列表。此功能用于加载自转换 / 自收集的 LiteRT-LM 模型（例如用 [LiteRT-LM 转换工具链](https://ai.google.dev/edge/litert-lm) 从 GGUF 等格式转换出的产物）。
 
-**文档规范：** 项目文档编写、命名、结构与维护遵循 [docs/DOCUMENTATION_STANDARDS.md](docs/DOCUMENTATION_STANDARDS.md)。
+**文档规范：** 项目文档编写、命名、结构与维护遵循 [docs/DOCUMENTATION_STANDARDS.md](docs/DOCUMENTATION_STANDARDS.md)；多语言支持与文案管理遵循 [docs/I18N_STANDARDS.md](docs/I18N_STANDARDS.md)。
 
 > **关于上游文档：** 本仓库仅发布 Android 应用源码。上游附带的部分本地文件
 > （`CONTRIBUTING.md`、`DEVELOPMENT.md`、`ANDROID_API_README.md` 等）及本地工作区产物
-> （`models/`、`skills/`、`mcp/` 等）已被 `.gitignore` 排除，不随仓库分发；如需查阅请访问
-> [上游仓库](https://github.com/google-ai-edge/gallery)。
+> （`models/`、`skills/`、`mcp/` 等）已被 `.gitignore` 排除并统一收拢到 `local/` 目录，
+> 不随仓库分发；如需查阅请访问 [上游仓库](https://github.com/google-ai-edge/gallery)。
 
 ## 致谢 / Acknowledgments
 

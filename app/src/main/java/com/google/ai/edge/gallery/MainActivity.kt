@@ -17,6 +17,7 @@
 package com.google.ai.edge.gallery
 
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -50,6 +51,7 @@ import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
+import com.google.ai.edge.gallery.data.AppLocaleHelper
 import com.google.ai.edge.gallery.ui.modelmanager.ModelManagerViewModel
 import com.google.ai.edge.gallery.ui.theme.GalleryTheme
 import com.google.ai.edge.litertlm.ExperimentalApi
@@ -66,7 +68,36 @@ class MainActivity : ComponentActivity() {
   private var splashScreenAboutToExit: Boolean = false
   private var contentSet: Boolean = false
 
+  /**
+   * Set by the settings page before recreating the activity for a language switch. When set, the
+   * activity skips the startup splash (which would otherwise show a blank screen for ~1s during the
+   * language-switch recreate).
+   */
+  companion object {
+    private const val TAG = "AGMainActivity"
+
+    @JvmStatic
+    var skipSplashOnNextCreate: Boolean = false
+  }
+
+  override fun attachBaseContext(base: Context) {
+    // Apply the user-selected app language on every activity (re)creation. The Application-level
+    // override handles the process-start case; this one ensures a language switch takes effect
+    // immediately when the activity is recreated from the settings page.
+    super.attachBaseContext(AppLocaleHelper.applyLocale(base))
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
+    // A language switch recreates this activity. Skip the startup splash (which would otherwise
+    // show a blank screen for ~1s) and render the content immediately. The manifest theme is the
+    // SplashScreen theme (an ActionBar-bearing parent), so the post-splash theme must be applied
+    // here to avoid a stray ActionBar showing the app label during the recreate.
+    val skipSplash = skipSplashOnNextCreate
+    skipSplashOnNextCreate = false
+    if (skipSplash) {
+      setTheme(R.style.Theme_Gallery)
+    }
+
     // We intentionally pass null to discard the saved instance state bundle.
     // This prevents Jetpack Compose from automatically restoring the previous screen
     // and forces the app to start cleanly on the Home Screen after an OS kill.
@@ -125,6 +156,20 @@ class MainActivity : ComponentActivity() {
     }
 
     modelManagerViewModel.loadModelAllowlist()
+
+    if (skipSplash) {
+      // Language-switch recreate: render content right away, no splash delay.
+      setContent()
+      enableEdgeToEdge()
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        // Fix for three-button nav not properly going edge-to-edge.
+        // See: https://issuetracker.google.com/issues/298296168
+        window.isNavigationBarContrastEnforced = false
+      }
+      // Keep the screen on while the app is running for better demo experience.
+      window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+      return
+    }
 
     // Show splash screen.
     val splashScreen = installSplashScreen()
@@ -215,9 +260,5 @@ class MainActivity : ComponentActivity() {
         "device_model" to Build.MODEL,
       ),
     )
-  }
-
-  companion object {
-    private const val TAG = "AGMainActivity"
   }
 }

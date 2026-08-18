@@ -191,7 +191,7 @@ fun ModelDownloadHome(
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("AI Edge Gallery", style = MaterialTheme.typography.titleLarge)
             Text(
-              "模型下载 · 本地 API 服务",
+              stringResource(R.string.home_subtitle),
               style = MaterialTheme.typography.labelMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -260,9 +260,9 @@ fun ModelDownloadHome(
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
           Text(
             if (uiState.loadingModelAllowlist) {
-              "正在加载模型列表…"
+              stringResource(R.string.loading_model_list)
             } else {
-              "暂无可用模型，请检查网络后点击右上角刷新，或点击右下角 + 导入本地模型。"
+              stringResource(R.string.home_empty_model_list)
             },
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,

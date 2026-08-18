@@ -1,4 +1,4 @@
-<!--
+﻿<!--
  Copyright 2025 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -547,9 +547,9 @@
   <!-- Button label to retry model import. -->
   <string name="retry" translatable="true" description="Label for a button to retry a failed operation (e.g., reloading data). [CHAR_LIMIT=7]">Retry</string>
   <!-- Snackbar hint shown when the user taps the import button, before the file picker opens. -->
-  <string name="import_model_hint_message" translatable="true" description="Hint telling the user that only .litertlm model files can be imported. [CHAR_LIMIT=30]">请上传 .litertlm 格式的模型文件</string>
+  <string name="import_model_hint_message" translatable="true" description="Hint telling the user that only .litertlm model files can be imported. [CHAR_LIMIT=30]">Please upload a .litertlm model file</string>
   <!-- Snackbar message shown after a model has been imported successfully. -->
-  <string name="model_imported_success" translatable="true" description="Message shown when a model file has been imported successfully. [CHAR_LIMIT=18]">模型导入成功</string>
+  <string name="model_imported_success" translatable="true" description="Message shown when a model file has been imported successfully. [CHAR_LIMIT=18]">Model imported successfully</string>
   <!-- Title of the theme selection setting. -->
   <string name="theme_title" translatable="true" description="Label for the settings section or configuration key where users can choose the visual theme of the app (e.g., Light, Dark). [CHAR_LIMIT=7]">Theme</string>
   <!-- Title of the section for third-party libraries in settings. -->
@@ -584,67 +584,67 @@
 
   <!-- Config Labels -->
   <!-- Label for the 'Max tokens' option in the model configuration dialog. -->
-  <string name="config_label_max_tokens" translatable="false">Max tokens</string>
+  <string name="config_label_max_tokens" translatable="true">Max tokens</string>
   <!-- Label for the 'Max output tokens' option in the model configuration dialog. -->
-  <string name="config_label_max_output_tokens" translatable="false">Max output tokens</string>
+  <string name="config_label_max_output_tokens" translatable="true">Max output tokens</string>
   <!-- Label for the 'TopK' option in the model configuration dialog. -->
-  <string name="config_label_topk" translatable="false">TopK</string>
+  <string name="config_label_topk" translatable="true">TopK</string>
   <!-- Label for the 'TopP' option in the model configuration dialog. -->
-  <string name="config_label_topp" translatable="false">TopP</string>
+  <string name="config_label_topp" translatable="true">TopP</string>
   <!-- Label for the 'Temperature' option in the model configuration dialog. -->
-  <string name="config_label_temperature" translatable="false">Temperature</string>
+  <string name="config_label_temperature" translatable="true">Temperature</string>
   <!-- Label for the 'Default max tokens' option in the model configuration dialog. -->
-  <string name="config_label_default_max_tokens" translatable="false">Default max tokens</string>
+  <string name="config_label_default_max_tokens" translatable="true">Default max tokens</string>
   <!-- Label for the 'Default TopK' option in the model configuration dialog. -->
-  <string name="config_label_default_topk" translatable="false">Default TopK</string>
+  <string name="config_label_default_topk" translatable="true">Default TopK</string>
   <!-- Label for the 'Default TopP' option in the model configuration dialog. -->
-  <string name="config_label_default_topp" translatable="false">Default TopP</string>
+  <string name="config_label_default_topp" translatable="true">Default TopP</string>
   <!-- Label for the 'Default temperature' option in the model configuration dialog. -->
-  <string name="config_label_default_temperature" translatable="false">Default temperature</string>
+  <string name="config_label_default_temperature" translatable="true">Default temperature</string>
   <!-- Label for the 'Support image' option in the model configuration dialog. -->
-  <string name="config_label_support_image" translatable="false">Support image</string>
+  <string name="config_label_support_image" translatable="true">Support image</string>
   <!-- Label for the 'Support audio' option in the model configuration dialog. -->
-  <string name="config_label_support_audio" translatable="false">Support audio</string>
+  <string name="config_label_support_audio" translatable="true">Support audio</string>
   <!-- Label for the 'Support tiny garden' option in the model configuration dialog. -->
-  <string name="config_label_support_tiny_garden" translatable="false">Support tiny garden</string>
+  <string name="config_label_support_tiny_garden" translatable="true">Support tiny garden</string>
   <!-- Label for the 'Support mobile actions' option in the model configuration dialog. -->
-  <string name="config_label_support_mobile_actions" translatable="false">Support mobile actions</string>
+  <string name="config_label_support_mobile_actions" translatable="true">Support mobile actions</string>
   <!-- Label for the 'Support thinking' option in the model configuration dialog. -->
-  <string name="config_label_support_thinking" translatable="false">Support thinking</string>
+  <string name="config_label_support_thinking" translatable="true">Support thinking</string>
   <!-- Label for the 'Support speculative decoding' option in the model configuration dialog. -->
-  <string name="config_label_support_speculative_decoding" translatable="false">Support speculative decoding</string>
+  <string name="config_label_support_speculative_decoding" translatable="true">Support speculative decoding</string>
   <!-- Label for the 'Enable thinking' option in the model configuration dialog. -->
-  <string name="config_label_enable_thinking" translatable="false">Enable thinking</string>
+  <string name="config_label_enable_thinking" translatable="true">Enable thinking</string>
   <!-- Label for the 'Enable speculative decoding' option in the model configuration dialog. -->
-  <string name="config_label_enable_speculative_decoding" translatable="false">Enable speculative decoding</string>
+  <string name="config_label_enable_speculative_decoding" translatable="true">Enable speculative decoding</string>
   <!-- Label for the 'Max result count' option in the model configuration dialog. -->
-  <string name="config_label_max_result_count" translatable="false">Max result count</string>
+  <string name="config_label_max_result_count" translatable="true">Max result count</string>
   <!-- Label for the 'Use GPU' option in the model configuration dialog. -->
-  <string name="config_label_use_gpu" translatable="false">Use GPU</string>
+  <string name="config_label_use_gpu" translatable="true">Use GPU</string>
   <!-- Label for the 'Accelerator' option in the model configuration dialog. -->
-  <string name="config_label_accelerator" translatable="false">Accelerator</string>
+  <string name="config_label_accelerator" translatable="true">Accelerator</string>
   <!-- Label for the 'Vision accelerator' option in the model configuration dialog. -->
-  <string name="config_label_vision_accelerator" translatable="false">Vision accelerator</string>
+  <string name="config_label_vision_accelerator" translatable="true">Vision accelerator</string>
   <!-- Label for the 'Compatible accelerators' option in the model configuration dialog. -->
-  <string name="config_label_compatible_accelerators" translatable="false">Compatible accelerators</string>
+  <string name="config_label_compatible_accelerators" translatable="true">Compatible accelerators</string>
   <!-- Label for the 'Warm up iterations' option in the model configuration dialog. -->
-  <string name="config_label_warm_up_iterations" translatable="false">Warm up iterations</string>
+  <string name="config_label_warm_up_iterations" translatable="true">Warm up iterations</string>
   <!-- Label for the 'Benchmark iterations' option in the model configuration dialog. -->
-  <string name="config_label_benchmark_iterations" translatable="false">Benchmark iterations</string>
+  <string name="config_label_benchmark_iterations" translatable="true">Benchmark iterations</string>
   <!-- Label for the 'Iterations' option in the model configuration dialog. -->
-  <string name="config_label_iterations" translatable="false">Iterations</string>
+  <string name="config_label_iterations" translatable="true">Iterations</string>
   <!-- Label for the 'Model type' option in the model configuration dialog. -->
-  <string name="config_label_model_type" translatable="false">Model type</string>
+  <string name="config_label_model_type" translatable="true">Model type</string>
   <!-- Label for the 'Model' option in the model configuration dialog. -->
-  <string name="config_label_model" translatable="false">Model</string>
+  <string name="config_label_model" translatable="true">Model</string>
   <!-- Label for the 'Number of turns before the conversation resets' option in the model configuration dialog. -->
-  <string name="config_label_reset_conversation_turn_count" translatable="false">Number of turns before the conversation resets</string>
+  <string name="config_label_reset_conversation_turn_count" translatable="true">Number of turns before the conversation resets</string>
   <!-- Label for the 'Prefill tokens' option in the model configuration dialog. -->
-  <string name="config_label_prefill_tokens" translatable="false">Prefill tokens</string>
+  <string name="config_label_prefill_tokens" translatable="true">Prefill tokens</string>
   <!-- Label for the 'Decode tokens' option in the model configuration dialog. -->
-  <string name="config_label_decode_tokens" translatable="false">Decode tokens</string>
+  <string name="config_label_decode_tokens" translatable="true">Decode tokens</string>
   <!-- Label for the 'Number of runs' option in the model configuration dialog. -->
-  <string name="config_label_number_of_runs" translatable="false">Number of runs</string>
+  <string name="config_label_number_of_runs" translatable="true">Number of runs</string>
   <!-- Label indicating statistics on a specific accelerator. %1$s is the accelerator name. -->
   <string name="stats_on_accelerator" translatable="true" description="Label for the section displaying performance statistics on a specific hardware accelerator (e.g., 'Stats on GPU'). [CHAR_LIMIT=15]">Stats on %1$s</string>
   <!-- First part of Gemma 4 introduction text. -->
@@ -653,11 +653,11 @@
   <string name="gemma4_intro_part_2" translatable="true" description="Second part of the introductory text, connecting the LiteRT community link and the Gemma 4 link. [CHAR_LIMIT=26]">, featuring the all-new </string>
   <string name="gemma4_label" translatable="false">Gemma 4</string>
   <!-- Label for the 'Show 3D spinner during image gen' option in the model configuration dialog. -->
-  <string name="config_label_show_3d_spinner" translatable="false">Show 3D spinner during image gen</string>
+  <string name="config_label_show_3d_spinner" translatable="true">Show 3D spinner during image gen</string>
   <!-- Label for the 'Font size' option in the model configuration dialog. -->
-  <string name="config_label_font_size" translatable="false">Font size</string>
+  <string name="config_label_font_size" translatable="true">Font size</string>
   <!-- Label for the 'Max character count' option in the model configuration dialog. -->
-  <string name="config_label_max_char_count" translatable="false">Max character count</string>
+  <string name="config_label_max_char_count" translatable="true">Max character count</string>
   <string name="new_badge" translatable="true" description="Badge label indicating a new feature. [CHAR_LIMIT=5]">New</string>
   <!-- Home Screen Promos -->
   <string name="gemma_reskin_try_gemma_4_chat" translatable="true" description="Promo card description to try Gemma 4 chat. [CHAR_LIMIT=50]">Chat with the latest Gemma 4 model today</string>
@@ -774,17 +774,72 @@
   <!-- Keep-alive foreground service notification. -->
   <string name="api_server_notification_channel_name">API server</string>
   <string name="api_server_notification_channel_desc">Shows a persistent notification while the local API server is running</string>
-  <string name="api_server_notification_title">API 服务运行中</string>
-  <string name="api_server_notification_content">本地 OpenAI 兼容服务正在后台运行，点击打开</string>
-  <string name="api_server_notification_content_with_model">模型 %1$s 正在后台提供服务，点击打开</string>
+  <string name="api_server_notification_title">API server is running</string>
+  <string name="api_server_notification_content">Local OpenAI-compatible server is running in the background. Tap to open.</string>
+  <string name="api_server_notification_content_with_model">Model %1$s is serving in the background. Tap to open.</string>
 
   <!-- Keep-alive guidance shown on the API server screen. -->
-  <string name="keepalive_title">保活设置</string>
-  <string name="keepalive_desc">服务运行在后台时，开启以下设置可避免被系统/厂商杀后台，保证接口随时可调用。</string>
-  <string name="keepalive_battery_opt_ok">已忽略电池优化</string>
-  <string name="keepalive_battery_opt_missing">未忽略电池优化</string>
-  <string name="keepalive_battery_opt_action">忽略电池优化</string>
-  <string name="keepalive_vendor_action">电源管理 / 后台运行白名单</string>
-  <string name="keepalive_notification_action">申请通知权限</string>
-  <string name="keepalive_notification_granted">通知权限已授予</string>
+  <string name="keepalive_title">Keep-alive settings</string>
+  <string name="keepalive_desc">When the server runs in the background, enabling the options below prevents the system / vendor from killing it, keeping the API callable at any time.</string>
+  <string name="keepalive_battery_opt_ok">Battery optimization ignored</string>
+  <string name="keepalive_battery_opt_missing">Battery optimization not ignored</string>
+  <string name="keepalive_battery_opt_action">Ignore battery optimization</string>
+  <string name="keepalive_vendor_action">Power management / background whitelist</string>
+  <string name="keepalive_notification_action">Request notification permission</string>
+  <string name="keepalive_notification_granted">Notification permission granted</string>
+
+  <!-- ============ Fork-specific screens (download home, API server, settings) ============ -->
+  <!-- Model download home page. -->
+  <string name="home_subtitle" translatable="true" description="Subtitle under the app title on the model download home page. [CHAR_LIMIT=30]">Model downloads · Local API service</string>
+  <string name="home_loading_model_list" translatable="true" description="Loading message shown on the model download home page while the model list is being fetched. [CHAR_LIMIT=24]">Loading model list…</string>
+  <string name="home_empty_model_list" translatable="true" description="Empty-state message on the model download home page telling the user to refresh or import a model. [CHAR_LIMIT=90]">No models available. Check your network and tap refresh in the top-right corner, or tap + in the bottom-right corner to import a local model.</string>
+
+  <!-- API server screen. -->
+  <string name="api_server_current_model" translatable="true" description="Label for the currently selected model on the API server screen. [CHAR_LIMIT=15]">Current model</string>
+  <string name="api_server_version_runtime" translatable="true" description="Model version and runtime info line. %1$s is the version, %2$s is the runtime type. [CHAR_LIMIT=40]">Version: %1$s · Runtime: %2$s</string>
+  <string name="api_server_model_ready" translatable="true" description="Status message when the model is initialized and the API server can be started. [CHAR_LIMIT=45]">Model is ready. You can start the API server.</string>
+  <string name="api_server_model_initializing" translatable="true" description="Status message while the model is loading on the API server screen. [CHAR_LIMIT=25]">Loading model…</string>
+  <string name="api_server_model_init_failed" translatable="true" description="Error message when model initialization fails. %1$s is the error detail. [CHAR_LIMIT=60]">Model initialization failed: %1$s</string>
+  <string name="api_server_model_not_initialized" translatable="true" description="Status message when the model has not been initialized yet. [CHAR_LIMIT=70]">Model not initialized yet. It will load automatically after download; please wait.</string>
+  <string name="api_server_title" translatable="true" description="Title of the OpenAI-compatible API server section. [CHAR_LIMIT=40]">OpenAI-compatible API service</string>
+  <string name="api_server_running" translatable="true" description="Status label shown while the API server is running. [CHAR_LIMIT=20]">Server running</string>
+  <string name="api_server_not_running" translatable="true" description="Status label shown while the API server is not running. [CHAR_LIMIT=25]">Server not running</string>
+  <string name="api_server_copy_address" translatable="true" description="Content description for the button that copies the API server URL. [CHAR_LIMIT=20]">Copy address</string>
+  <string name="api_server_lan_hint" translatable="true" description="Hint explaining that any OpenAI-compatible client on the same LAN can access the server. [CHAR_LIMIT=110]">Any OpenAI-compatible client on the same LAN (curl, Python openai library, etc.) can access it.</string>
+  <string name="api_server_stop" translatable="true" description="Button label to stop the API server. [CHAR_LIMIT=15]">Stop server</string>
+  <string name="api_server_start" translatable="true" description="Button label to start the API server. [CHAR_LIMIT=15]">Start server</string>
+  <string name="api_server_wait_ready" translatable="true" description="Button label shown while the model is not ready to start the server. [CHAR_LIMIT=25]">Waiting for model to be ready…</string>
+  <string name="api_server_initializing_hint" translatable="true" description="Hint shown while the model is initializing before the server can start. [CHAR_LIMIT=70]">Model is initializing. You can start the server once it is ready.</string>
+  <string name="api_server_auth_token_title" translatable="true" description="Title of the access-token section on the API server screen. [CHAR_LIMIT=30]">Access token (optional)</string>
+  <string name="api_server_auth_token_desc" translatable="true" description="Description of how the access token works. [CHAR_LIMIT=90]">When set, client requests must include Authorization: Bearer &lt;token&gt;. Leave empty to disable authentication.</string>
+  <string name="api_server_token_label" translatable="true" description="Label for the access-token input field. [CHAR_LIMIT=10]">Token</string>
+  <string name="api_server_save_token" translatable="true" description="Button label to save the access token. [CHAR_LIMIT=15]">Save token</string>
+  <string name="api_server_usage_title" translatable="true" description="Title of the usage/API-reference section on the API server screen. [CHAR_LIMIT=15]">Usage</string>
+  <string name="api_server_list_models" translatable="true" description="Label for the list-models endpoint. [CHAR_LIMIT=20]">List models:</string>
+  <string name="api_server_chat_streaming" translatable="true" description="Label for the chat-completions endpoint, noting streaming support. [CHAR_LIMIT=30]">Chat (streaming supported):</string>
+  <string name="api_server_curl_example" translatable="true" description="Label introducing a curl example. [CHAR_LIMIT=20]">curl example:</string>
+  <string name="api_server_curl_body" translatable="true" description="curl example command body. %1$s is the model name. [CHAR_LIMIT=200]">curl http://&lt;host-ip&gt;:8080/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -d \'{"model": "%1$s", "messages": [{"role": "user", "content": "你好"}], "stream": true}\'</string>
+  <string name="api_server_health_debug" translatable="true" description="Hint about the health-check and debug endpoints. [CHAR_LIMIT=60]">Health check: GET {base}/health · Debug info: GET {base}/debug</string>
+  <string name="api_server_copied" translatable="true" description="Toast message shown when the API server URL is copied. [CHAR_LIMIT=10]">Copied</string>
+
+  <!-- API server settings (keep-alive + download source). -->
+  <string name="settings_title" translatable="true" description="Title of the API server settings page. [CHAR_LIMIT=12]">Settings</string>
+  <string name="settings_back" translatable="true" description="Content description for the back button on the settings page. [CHAR_LIMIT=10]">Back</string>
+  <string name="download_source_title" translatable="true" description="Title of the model download-source section in settings. [CHAR_LIMIT=15]">Download source</string>
+  <string name="download_source_desc" translatable="true" description="Description of the download-source options. [CHAR_LIMIT=130]">Choose where model files are downloaded from. Switch to ModelScope to download from a domestic mirror for faster speeds; ModelScope currently only offers Gemma 4 E2B / E4B models, other models automatically fall back to the direct source.</string>
+  <string name="download_source_hf" translatable="true" description="Option label for the original Hugging Face download source. [CHAR_LIMIT=30]">Direct (Hugging Face)</string>
+  <string name="download_source_modelscope" translatable="true" description="Option label for the ModelScope download source. [CHAR_LIMIT=30]">ModelScope</string>
+  <string name="keepalive_notification_missing" translatable="true" description="Status text shown when notification permission has not been granted. [CHAR_LIMIT=35]">Notification permission: not granted</string>
+  <string name="keepalive_battery_behavior_desc" translatable="true" description="Note about OPPO / OnePlus battery behavior whitelist. [CHAR_LIMIT=90]">Battery behavior (OPPO / OnePlus, etc.): please select "Allow all background behavior", otherwise the app may still be restricted in the background.</string>
+  <string name="keepalive_battery_behavior_action" translatable="true" description="Button label to request full background behavior whitelist. [CHAR_LIMIT=35]">Request full background behavior</string>
+  <string name="toast_open_battery_settings_failed" translatable="true" description="Toast shown when the battery-optimization settings cannot be opened. [CHAR_LIMIT=30]">Unable to open battery optimization settings</string>
+  <string name="toast_power_mgmt_not_found" translatable="true" description="Toast shown when no vendor power-management settings entry is found. [CHAR_LIMIT=30]">Power management settings not found</string>
+  <string name="toast_battery_behavior_not_found" translatable="true" description="Toast shown when no vendor battery-behavior settings entry is found. [CHAR_LIMIT=30]">Battery behavior settings not found</string>
+
+  <!-- App language selection (settings page). -->
+  <string name="settings_language_title" translatable="true" description="Title of the language-selection section in settings. [CHAR_LIMIT=12]">Language</string>
+  <string name="settings_language_desc" translatable="true" description="Description of the language-selection options. [CHAR_LIMIT=70]">Choose the app display language. Unsupported languages fall back to English.</string>
+  <string name="settings_language_system" translatable="true" description="Option to follow the device system language. [CHAR_LIMIT=20]">Follow system</string>
+  <string name="settings_language_zh_cn" translatable="true" description="Option to force Simplified Chinese. [CHAR_LIMIT=15]">简体中文</string>
+  <string name="settings_language_en" translatable="true" description="Option to force English. [CHAR_LIMIT=10]">English</string>
 </resources>

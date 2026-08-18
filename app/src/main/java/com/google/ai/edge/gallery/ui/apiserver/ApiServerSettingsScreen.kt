@@ -23,6 +23,7 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -58,11 +59,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.ai.edge.gallery.R
+import com.google.ai.edge.gallery.MainActivity
+import com.google.ai.edge.gallery.data.AppLocale
+import com.google.ai.edge.gallery.data.AppLocaleStore
 import com.google.ai.edge.gallery.data.ModelDownloadSource
 import com.google.ai.edge.gallery.data.ModelDownloadSourceStore
 
@@ -99,6 +105,9 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
   // --- Model download source ---
   var downloadSource by remember { mutableStateOf(ModelDownloadSourceStore.get(context)) }
 
+  // --- App language ---
+  var appLocale by remember { mutableStateOf(AppLocaleStore.get(context)) }
+
   LaunchedEffect(Unit) {
     refreshKeepAliveState()
   }
@@ -124,12 +133,12 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
         title = {
           Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Rounded.Settings, contentDescription = null)
-            Text("设置")
+            Text(stringResource(R.string.settings_title))
           }
         },
         navigationIcon = {
           IconButton(onClick = onBackClicked) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "返回")
+            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.settings_back))
           }
         },
       )
@@ -144,13 +153,64 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
           .padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+      // --- App language ---
+      Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+          Text(stringResource(R.string.settings_language_title), style = MaterialTheme.typography.titleMedium)
+          Text(
+            stringResource(R.string.settings_language_desc),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+
+          val localeOptions =
+            listOf(
+              AppLocale.SYSTEM to stringResource(R.string.settings_language_system),
+              AppLocale.ZH_RCN to stringResource(R.string.settings_language_zh_cn),
+              AppLocale.EN to stringResource(R.string.settings_language_en),
+            )
+          localeOptions.forEach { (locale, label) ->
+            Row(
+              verticalAlignment = Alignment.CenterVertically,
+              horizontalArrangement = Arrangement.spacedBy(8.dp),
+              modifier =
+                Modifier
+                  .fillMaxWidth()
+                  .selectable(
+                    selected = appLocale == locale,
+                    onClick = {
+                      appLocale = locale
+                      AppLocaleStore.set(context, locale)
+                      // Recreate the activity so every screen re-inflates its resources with the
+                      // new locale. Skip the startup splash to avoid a blank flash during the
+                      // recreate. attachBaseContext applies the stored locale on the next launch.
+                      MainActivity.skipSplashOnNextCreate = true
+                      (context as? ComponentActivity)?.recreate()
+                    },
+                  )
+                  .padding(vertical = 4.dp),
+            ) {
+              RadioButton(
+                selected = appLocale == locale,
+                onClick = {
+                  appLocale = locale
+                  AppLocaleStore.set(context, locale)
+                  MainActivity.skipSplashOnNextCreate = true
+                  (context as? ComponentActivity)?.recreate()
+                },
+              )
+              Text(label, style = MaterialTheme.typography.bodyMedium)
+            }
+          }
+        }
+      }
+
       // --- Model download source ---
       Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-          Text("下载源", style = MaterialTheme.typography.titleMedium)
+          Text(stringResource(R.string.download_source_title), style = MaterialTheme.typography.titleMedium)
           Text(
-            "选择模型文件的下载来源。切换到「魔搭社区」可从国内镜像下载，速度更快；" +
-              "魔搭目前仅提供 Gemma 4 E2B / E4B 模型，其他模型会自动回退到原生直连。",
+            stringResource(R.string.download_source_desc),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -177,7 +237,7 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
                 ModelDownloadSourceStore.set(context, ModelDownloadSource.HF)
               },
             )
-            Text("原生直连（Hugging Face）", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.download_source_hf), style = MaterialTheme.typography.bodyMedium)
           }
 
           Row(
@@ -202,7 +262,7 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
                 ModelDownloadSourceStore.set(context, ModelDownloadSource.MODELSCOPE)
               },
             )
-            Text("魔搭社区（ModelScope）", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.download_source_modelscope), style = MaterialTheme.typography.bodyMedium)
           }
         }
       }
@@ -210,9 +270,9 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
       // --- Keep-alive ---
       Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-          Text("保活设置", style = MaterialTheme.typography.titleMedium)
+          Text(stringResource(R.string.keepalive_title), style = MaterialTheme.typography.titleMedium)
           Text(
-            "服务运行在后台时，开启以下设置可避免被系统/厂商杀后台，保证接口随时可调用。",
+            stringResource(R.string.keepalive_desc),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -224,7 +284,8 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
           ) {
             Text(
-              if (hasNotificationPermission) "通知权限：已授予" else "通知权限：未授予",
+              if (hasNotificationPermission) stringResource(R.string.keepalive_notification_granted)
+              else stringResource(R.string.keepalive_notification_missing),
               style = MaterialTheme.typography.bodyMedium,
               modifier = Modifier.weight(1f),
             )
@@ -236,7 +297,7 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
               },
               enabled = !hasNotificationPermission,
             ) {
-              Text("申请通知权限")
+              Text(stringResource(R.string.keepalive_notification_action))
             }
           }
 
@@ -247,7 +308,8 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
             modifier = Modifier.fillMaxWidth(),
           ) {
             Text(
-              if (isIgnoringBatteryOptimizations) "电池优化：已忽略" else "电池优化：未忽略",
+              if (isIgnoringBatteryOptimizations) stringResource(R.string.keepalive_battery_opt_ok)
+              else stringResource(R.string.keepalive_battery_opt_missing),
               style = MaterialTheme.typography.bodyMedium,
               modifier = Modifier.weight(1f),
             )
@@ -261,12 +323,12 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
                 try {
                   context.startActivity(intent)
                 } catch (e: Exception) {
-                  Toast.makeText(context, "无法打开电池优化设置", Toast.LENGTH_SHORT).show()
+                  Toast.makeText(context, context.getString(R.string.toast_open_battery_settings_failed), Toast.LENGTH_SHORT).show()
                 }
               },
               enabled = !isIgnoringBatteryOptimizations,
             ) {
-              Text("忽略电池优化")
+              Text(stringResource(R.string.keepalive_battery_opt_action))
             }
           }
 
@@ -275,13 +337,13 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
             onClick = { openVendorPowerManagementSettings(context) },
             modifier = Modifier.fillMaxWidth(),
           ) {
-            Text("电源管理 / 后台运行白名单")
+            Text(stringResource(R.string.keepalive_vendor_action))
           }
 
           // Vendor battery-behavior whitelist (OPPO / OnePlus "battery behavior").
           HorizontalDivider()
           Text(
-            "耗电行为（OPPO / 一加等）：请选择「完全允许后台行为」，否则后台仍可能被限制。",
+            stringResource(R.string.keepalive_battery_behavior_desc),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -289,7 +351,7 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
             onClick = { openVendorBatteryBehaviorSettings(context) },
             modifier = Modifier.fillMaxWidth(),
           ) {
-            Text("申请完全允许后台行为")
+            Text(stringResource(R.string.keepalive_battery_behavior_action))
           }
         }
       }
@@ -358,7 +420,7 @@ private fun openVendorPowerManagementSettings(context: Context) {
       }
     }
   }
-  Toast.makeText(context, "未找到电源管理设置", Toast.LENGTH_SHORT).show()
+  Toast.makeText(context, context.getString(R.string.toast_power_mgmt_not_found), Toast.LENGTH_SHORT).show()
 }
 
 /**
@@ -395,5 +457,5 @@ private fun openVendorBatteryBehaviorSettings(context: Context) {
       }
     }
   }
-  Toast.makeText(context, "未找到耗电行为设置", Toast.LENGTH_SHORT).show()
+  Toast.makeText(context, context.getString(R.string.toast_battery_behavior_not_found), Toast.LENGTH_SHORT).show()
 }

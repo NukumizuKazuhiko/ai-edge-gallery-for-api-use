@@ -1,0 +1,167 @@
+<!--
+ Copyright 2026 NukumizuKazuhiko
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!--
+  简体中文（zh-rCN）文案资源。
+  - 默认语言为英文（res/values/strings.xml），此处仅覆盖需要本地化的字符串。
+  - 专有名词不翻译：GPU / CPU / NPU / Token / TopK / TopP / OpenAI / Hugging Face /
+    ModelScope / curl / LiteRT / Gemma / OPPO / OnePlus 等保留原文。
+  - 新增翻译前先阅读 docs/I18N_STANDARDS.md。
+-->
+
+<resources>
+  <!-- 通用按钮 / 状态 -->
+  <string name="cancel" translatable="true">取消</string>
+  <string name="ok" translatable="true">确定</string>
+  <string name="close" translatable="true">关闭</string>
+  <string name="error" translatable="true">错误</string>
+  <string name="unknown_error" translatable="true">未知错误</string>
+  <string name="save" translatable="true">保存</string>
+  <string name="done" translatable="true">完成</string>
+  <string name="delete" translatable="true">删除</string>
+  <string name="download" translatable="true">下载</string>
+  <string name="retry" translatable="true">重试</string>
+  <string name="restore_default" translatable="true">恢复默认</string>
+  <string name="name" translatable="true">名称</string>
+
+  <!-- 配置对话框 -->
+  <string name="config_dialog_title" translatable="true">配置</string>
+  <string name="config_dialog_tab_model_configs" translatable="true">模型配置</string>
+  <string name="config_dialog_tab_system_prompt" translatable="true">系统提示词</string>
+  <string name="benchmark_config_dialog_title" translatable="true">基准测试配置</string>
+  <string name="system_prompt_placeholder" translatable="true">输入系统指令（例如：“你是一名全能助手。请用专业语气提供准确、贴合语境的回答。”）</string>
+  <string name="system_prompt_updated" translatable="true">系统提示词已更新</string>
+  <string name="max_tokens_warning_message" translatable="true">将最大 Token 数设置为 10000 以上可能导致应用不稳定。</string>
+
+  <!-- 配置项标签（专有名词保留原文） -->
+  <string name="config_label_max_tokens" translatable="true">最大 Token 数</string>
+  <string name="config_label_max_output_tokens" translatable="true">最大输出 Token 数</string>
+  <string name="config_label_topk" translatable="true">TopK</string>
+  <string name="config_label_topp" translatable="true">TopP</string>
+  <string name="config_label_temperature" translatable="true">温度（Temperature）</string>
+  <string name="config_label_default_max_tokens" translatable="true">默认最大 Token 数</string>
+  <string name="config_label_default_topk" translatable="true">默认 TopK</string>
+  <string name="config_label_default_topp" translatable="true">默认 TopP</string>
+  <string name="config_label_default_temperature" translatable="true">默认温度</string>
+  <string name="config_label_support_image" translatable="true">支持图像输入</string>
+  <string name="config_label_support_audio" translatable="true">支持音频输入</string>
+  <string name="config_label_support_tiny_garden" translatable="true">支持 Tiny Garden</string>
+  <string name="config_label_support_mobile_actions" translatable="true">支持 Mobile Actions</string>
+  <string name="config_label_support_thinking" translatable="true">支持思考模式</string>
+  <string name="config_label_support_speculative_decoding" translatable="true">支持投机解码</string>
+  <string name="config_label_enable_thinking" translatable="true">启用思考模式</string>
+  <string name="config_label_enable_speculative_decoding" translatable="true">启用投机解码</string>
+  <string name="config_label_max_result_count" translatable="true">最大结果数</string>
+  <string name="config_label_use_gpu" translatable="true">使用 GPU</string>
+  <string name="config_label_accelerator" translatable="true">加速器</string>
+  <string name="config_label_vision_accelerator" translatable="true">视觉加速器</string>
+  <string name="config_label_compatible_accelerators" translatable="true">兼容加速器</string>
+  <string name="config_label_warm_up_iterations" translatable="true">预热迭代次数</string>
+  <string name="config_label_benchmark_iterations" translatable="true">基准测试迭代次数</string>
+  <string name="config_label_iterations" translatable="true">迭代次数</string>
+  <string name="config_label_model_type" translatable="true">模型类型</string>
+  <string name="config_label_model" translatable="true">模型</string>
+  <string name="config_label_reset_conversation_turn_count" translatable="true">对话自动重置前的轮数</string>
+  <string name="config_label_prefill_tokens" translatable="true">Prefill Token 数</string>
+  <string name="config_label_decode_tokens" translatable="true">Decode Token 数</string>
+  <string name="config_label_number_of_runs" translatable="true">运行次数</string>
+
+  <!-- 下载首页 -->
+  <string name="home_subtitle" translatable="true">模型下载 · 本地 API 服务</string>
+  <string name="home_empty_model_list" translatable="true">暂无可用模型，请检查网络后点击右上角刷新，或点击右下角 + 导入本地模型。</string>
+  <string name="model_list_imported_models_title" translatable="true">已导入的模型</string>
+  <string name="model_list_recommended_models_title" translatable="true">推荐模型</string>
+  <string name="model_list_experimental_label" translatable="true">实验性</string>
+  <string name="model_manager" translatable="true">模型管理</string>
+  <string name="loading_model_list" translatable="true">正在加载模型列表…</string>
+  <string name="downloaded_size" translatable="true">已下载 %1$s</string>
+  <string name="model_not_downloaded_msg" translatable="true">模型尚未下载</string>
+  <string name="confirm_delete_model_dialog_title" translatable="true">删除下载</string>
+  <string name="confirm_delete_model_dialog_content" translatable="true">确定要删除已下载的模型“%s”吗？</string>
+
+  <!-- 模型导入 -->
+  <string name="import_model" translatable="true">导入模型</string>
+  <string name="import_action" translatable="true">导入</string>
+  <string name="import_model_hint_message" translatable="true">请上传 .litertlm 格式的模型文件</string>
+  <string name="model_imported_success" translatable="true">模型导入成功</string>
+  <string name="failed_to_import" translatable="true">导入失败</string>
+  <string name="unsupported_model_title" translatable="true">不支持的模型类型</string>
+  <string name="unsupported_file_type_error" translatable="true">仅支持 “.litertlm” 格式的文件。</string>
+
+  <!-- API 服务页 -->
+  <string name="api_server_current_model" translatable="true">当前模型</string>
+  <string name="api_server_version_runtime" translatable="true">版本: %1$s · 运行库: %2$s</string>
+  <string name="api_server_model_ready" translatable="true">模型已就绪，可启动 API 服务。</string>
+  <string name="api_server_model_initializing" translatable="true">正在加载模型…</string>
+  <string name="api_server_model_init_failed" translatable="true">模型初始化失败: %1$s</string>
+  <string name="api_server_model_not_initialized" translatable="true">模型尚未初始化。下载完成后会自动加载，请稍候。</string>
+  <string name="api_server_title" translatable="true">OpenAI 兼容 API 服务</string>
+  <string name="api_server_running" translatable="true">服务运行中</string>
+  <string name="api_server_not_running" translatable="true">服务未启动</string>
+  <string name="api_server_copy_address" translatable="true">复制地址</string>
+  <string name="api_server_lan_hint" translatable="true">同一局域网内任意 OpenAI 兼容客户端（curl / Python openai 库等）都可访问。</string>
+  <string name="api_server_stop" translatable="true">停止服务</string>
+  <string name="api_server_start" translatable="true">启动服务</string>
+  <string name="api_server_wait_ready" translatable="true">等待模型就绪…</string>
+  <string name="api_server_initializing_hint" translatable="true">模型正在初始化，初始化完成后即可启动服务。</string>
+  <string name="api_server_auth_token_title" translatable="true">访问令牌（可选）</string>
+  <string name="api_server_auth_token_desc" translatable="true">设置后，客户端请求需携带 Authorization: Bearer &lt;token&gt;。留空则不鉴权。</string>
+  <string name="api_server_token_label" translatable="true">Token</string>
+  <string name="api_server_save_token" translatable="true">保存令牌</string>
+  <string name="api_server_usage_title" translatable="true">使用方法</string>
+  <string name="api_server_list_models" translatable="true">列出模型：</string>
+  <string name="api_server_chat_streaming" translatable="true">对话（支持流式）：</string>
+  <string name="api_server_curl_example" translatable="true">curl 示例：</string>
+  <string name="api_server_curl_body" translatable="true">curl http://&lt;本机IP&gt;:8080/v1/chat/completions \\\n  -H "Content-Type: application/json" \\\n  -d \'{"model": "%1$s", "messages": [{"role": "user", "content": "你好"}], "stream": true}\'</string>
+  <string name="api_server_health_debug" translatable="true">健康检查：GET {base}/health，调试信息：GET {base}/debug</string>
+  <string name="api_server_copied" translatable="true">已复制</string>
+
+  <!-- API 服务通知（前台服务） -->
+  <string name="api_server_notification_channel_name" translatable="true">API 服务</string>
+  <string name="api_server_notification_channel_desc" translatable="true">本地 API 服务运行时显示常驻通知</string>
+  <string name="api_server_notification_title" translatable="true">API 服务运行中</string>
+  <string name="api_server_notification_content" translatable="true">本地 OpenAI 兼容服务正在后台运行，点击打开</string>
+  <string name="api_server_notification_content_with_model" translatable="true">模型 %1$s 正在后台提供服务，点击打开</string>
+
+  <!-- 设置页 -->
+  <string name="settings_title" translatable="true">设置</string>
+  <string name="settings_back" translatable="true">返回</string>
+  <string name="download_source_title" translatable="true">下载源</string>
+  <string name="download_source_desc" translatable="true">选择模型文件的下载来源。切换到「魔搭社区」可从国内镜像下载，速度更快；魔搭目前仅提供 Gemma 4 E2B / E4B 模型，其他模型会自动回退到原生直连。</string>
+  <string name="download_source_hf" translatable="true">原生直连（Hugging Face）</string>
+  <string name="download_source_modelscope" translatable="true">魔搭社区（ModelScope）</string>
+  <string name="keepalive_title" translatable="true">保活设置</string>
+  <string name="keepalive_desc" translatable="true">服务运行在后台时，开启以下设置可避免被系统/厂商杀后台，保证接口随时可调用。</string>
+  <string name="keepalive_notification_granted" translatable="true">通知权限：已授予</string>
+  <string name="keepalive_notification_missing" translatable="true">通知权限：未授予</string>
+  <string name="keepalive_notification_action" translatable="true">申请通知权限</string>
+  <string name="keepalive_battery_opt_ok" translatable="true">电池优化：已忽略</string>
+  <string name="keepalive_battery_opt_missing" translatable="true">电池优化：未忽略</string>
+  <string name="keepalive_battery_opt_action" translatable="true">忽略电池优化</string>
+  <string name="keepalive_vendor_action" translatable="true">电源管理 / 后台运行白名单</string>
+  <string name="keepalive_battery_behavior_desc" translatable="true">耗电行为（OPPO / 一加等）：请选择「完全允许后台行为」，否则后台仍可能被限制。</string>
+  <string name="keepalive_battery_behavior_action" translatable="true">申请完全允许后台行为</string>
+  <string name="toast_open_battery_settings_failed" translatable="true">无法打开电池优化设置</string>
+  <string name="toast_power_mgmt_not_found" translatable="true">未找到电源管理设置</string>
+  <string name="toast_battery_behavior_not_found" translatable="true">未找到耗电行为设置</string>
+
+  <!-- 语言选择（设置页） -->
+  <string name="settings_language_title" translatable="true">语言</string>
+  <string name="settings_language_desc" translatable="true">选择应用显示语言。未支持的语言将回退为英文。</string>
+  <string name="settings_language_system" translatable="true">跟随系统</string>
+  <string name="settings_language_zh_cn" translatable="true">简体中文</string>
+  <string name="settings_language_en" translatable="true">English</string>
+</resources>

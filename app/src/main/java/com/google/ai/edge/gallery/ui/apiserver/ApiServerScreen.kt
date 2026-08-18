@@ -53,9 +53,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.api.ApiServerViewModel
 import com.google.ai.edge.gallery.customtasks.common.CustomTaskData
 import com.google.ai.edge.gallery.data.BuiltInTaskId
@@ -135,10 +137,10 @@ fun ApiServerScreen(
     // --- Model status ---
     Card(modifier = Modifier.fillMaxWidth()) {
       Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("当前模型", style = MaterialTheme.typography.labelLarge)
+        Text(stringResource(R.string.api_server_current_model), style = MaterialTheme.typography.labelLarge)
         Text(model.name, style = MaterialTheme.typography.titleLarge)
         Text(
-          "版本: ${model.version.ifEmpty { "unknown" }} · 运行库: ${model.runtimeType}",
+          stringResource(R.string.api_server_version_runtime, model.version.ifEmpty { "unknown" }, model.runtimeType),
           style = MaterialTheme.typography.bodyMedium,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -146,7 +148,7 @@ fun ApiServerScreen(
         when {
           isInitialized -> {
             Text(
-              "模型已就绪，可启动 API 服务。",
+              stringResource(R.string.api_server_model_ready),
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.primary,
             )
@@ -155,19 +157,19 @@ fun ApiServerScreen(
             Row(verticalAlignment = Alignment.CenterVertically) {
               CircularProgressIndicator(modifier = Modifier.width(20.dp).height(20.dp), strokeWidth = 2.dp)
               Spacer(modifier = Modifier.width(8.dp))
-              Text("正在加载模型…", style = MaterialTheme.typography.bodyMedium)
+              Text(stringResource(R.string.api_server_model_initializing), style = MaterialTheme.typography.bodyMedium)
             }
           }
           initError != null -> {
             Text(
-              "模型初始化失败: $initError",
+              stringResource(R.string.api_server_model_init_failed, initError),
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.error,
             )
           }
           else -> {
             Text(
-              "模型尚未初始化。下载完成后会自动加载，请稍候。",
+              stringResource(R.string.api_server_model_not_initialized),
               style = MaterialTheme.typography.bodyMedium,
               color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -181,12 +183,12 @@ fun ApiServerScreen(
       Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
           Icon(Icons.Outlined.Dns, contentDescription = null)
-          Text("OpenAI 兼容 API 服务", style = MaterialTheme.typography.titleMedium)
+          Text(stringResource(R.string.api_server_title), style = MaterialTheme.typography.titleMedium)
         }
 
         if (isRunning && baseUrl != null) {
           Text(
-            "服务运行中",
+            stringResource(R.string.api_server_running),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
           )
@@ -202,19 +204,19 @@ fun ApiServerScreen(
             )
             Icon(
               imageVector = Icons.Outlined.ContentCopy,
-              contentDescription = "复制地址",
+              contentDescription = stringResource(R.string.api_server_copy_address),
               tint = MaterialTheme.colorScheme.primary,
               modifier = Modifier.clickable { copyToClipboard(context, baseUrl!!) },
             )
           }
           Text(
-            "同一局域网内任意 OpenAI 兼容客户端（curl / Python openai 库等）都可访问。",
+            stringResource(R.string.api_server_lan_hint),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
         } else {
           Text(
-            "服务未启动",
+            stringResource(R.string.api_server_not_running),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -234,15 +236,18 @@ fun ApiServerScreen(
           if (isRunning) {
             Icon(Icons.Outlined.Stop, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("停止服务")
+            Text(stringResource(R.string.api_server_stop))
           } else {
-            Text(if (isInitialized) "启动服务" else "等待模型就绪…")
+            Text(
+              if (isInitialized) stringResource(R.string.api_server_start)
+              else stringResource(R.string.api_server_wait_ready)
+            )
           }
         }
 
         if (!isRunning && !isInitialized && isDownloaded) {
           Text(
-            "模型正在初始化，初始化完成后即可启动服务。",
+            stringResource(R.string.api_server_initializing_hint),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
           )
@@ -253,16 +258,16 @@ fun ApiServerScreen(
     // --- Auth token ---
     Card(modifier = Modifier.fillMaxWidth()) {
       Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("访问令牌（可选）", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.api_server_auth_token_title), style = MaterialTheme.typography.titleMedium)
         Text(
-          "设置后，客户端请求需携带 Authorization: Bearer <token>。留空则不鉴权。",
+          stringResource(R.string.api_server_auth_token_desc),
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
           value = tokenInput,
           onValueChange = { tokenInput = it },
-          label = { Text("Token") },
+          label = { Text(stringResource(R.string.api_server_token_label)) },
           singleLine = true,
           modifier = Modifier.fillMaxWidth(),
         )
@@ -270,7 +275,7 @@ fun ApiServerScreen(
           onClick = { apiServerViewModel.setAuthToken(tokenInput) },
           modifier = Modifier.fillMaxWidth(),
         ) {
-          Text("保存令牌")
+          Text(stringResource(R.string.api_server_save_token))
         }
       }
     }
@@ -278,30 +283,28 @@ fun ApiServerScreen(
     // --- Usage ---
     Card(modifier = Modifier.fillMaxWidth()) {
       Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("使用方法", style = MaterialTheme.typography.titleMedium)
-        Text("列出模型：", style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.api_server_usage_title), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.api_server_list_models), style = MaterialTheme.typography.bodySmall)
         Text(
           "GET {base}/v1/models",
           style = MaterialTheme.typography.bodyMedium,
           fontFamily = FontFamily.Monospace,
         )
-        Text("对话（支持流式）：", style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.api_server_chat_streaming), style = MaterialTheme.typography.bodySmall)
         Text(
           "POST {base}/v1/chat/completions",
           style = MaterialTheme.typography.bodyMedium,
           fontFamily = FontFamily.Monospace,
         )
         HorizontalDivider()
-        Text("curl 示例：", style = MaterialTheme.typography.bodySmall)
+        Text(stringResource(R.string.api_server_curl_example), style = MaterialTheme.typography.bodySmall)
         Text(
-          "curl http://<本机IP>:8080/v1/chat/completions \\\n" +
-            "  -H \"Content-Type: application/json\" \\\n" +
-            "  -d '{\"model\": \"${model.name}\", \"messages\": [{\"role\": \"user\", \"content\": \"你好\"}], \"stream\": true}'",
+          stringResource(R.string.api_server_curl_body, model.name),
           style = MaterialTheme.typography.bodySmall,
           fontFamily = FontFamily.Monospace,
         )
         Text(
-          "健康检查：GET {base}/health，调试信息：GET {base}/debug",
+          stringResource(R.string.api_server_health_debug),
           style = MaterialTheme.typography.bodySmall,
           color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -313,5 +316,5 @@ fun ApiServerScreen(
 private fun copyToClipboard(context: Context, text: String) {
   val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
   cm.setPrimaryClip(ClipData.newPlainText("api_url", text))
-  Toast.makeText(context, "已复制", Toast.LENGTH_SHORT).show()
+  Toast.makeText(context, context.getString(R.string.api_server_copied), Toast.LENGTH_SHORT).show()
 }

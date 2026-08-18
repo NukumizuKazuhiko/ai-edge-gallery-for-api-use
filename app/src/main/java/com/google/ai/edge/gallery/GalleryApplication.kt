@@ -17,6 +17,8 @@
 package com.google.ai.edge.gallery
 
 import android.app.Application
+import android.content.Context
+import com.google.ai.edge.gallery.data.AppLocaleHelper
 import com.google.ai.edge.gallery.data.DataStoreRepository
 import com.google.ai.edge.gallery.notifications.NotificationScheduleManager
 import com.google.ai.edge.gallery.ui.theme.ThemeSettings
@@ -29,6 +31,12 @@ class GalleryApplication : Application() {
 
   @Inject lateinit var dataStoreRepository: DataStoreRepository
   @Inject lateinit var notificationScheduleManager: NotificationScheduleManager
+
+  override fun attachBaseContext(base: Context) {
+    // Apply the user-selected app language before any resource is inflated so every activity
+    // inherits the locale. Returns an unchanged base when the app follows the system language.
+    super.attachBaseContext(AppLocaleHelper.applyLocale(base))
+  }
 
   override fun onCreate() {
     super.onCreate()
