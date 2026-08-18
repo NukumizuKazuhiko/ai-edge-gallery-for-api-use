@@ -56,7 +56,7 @@ constructor(
   override val task: Task by lazy {
     Task(
       id = BuiltInTaskId.LLM_CHAT,
-      label = context.getString(R.string.task_label_ai_chat),
+      label = context.getString(R.string.task_label_api_service),
       category = Category.LLM,
       icon = Icons.Outlined.Dns,
       models = mutableListOf(),

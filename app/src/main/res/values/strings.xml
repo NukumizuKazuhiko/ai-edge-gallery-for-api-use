@@ -719,7 +719,7 @@
   <string name="explore_other_use_cases" translatable="true" description="Section header for other use cases.">Explore other use cases</string>
 
   <!-- Task Labels & Descriptions -->
-  <string name="task_label_ai_chat" translatable="false">AI Chat</string>
+  <string name="task_label_api_service" translatable="false">API Service</string>
   <string name="task_label_prompt_lab" translatable="false">Prompt Lab</string>
   <string name="task_label_ask_image" translatable="false">Ask Image</string>
   <string name="task_label_audio_scribe" translatable="false">Audio Scribe</string>
