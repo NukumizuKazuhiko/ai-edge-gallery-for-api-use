@@ -148,6 +148,7 @@
   <string name="download_source_modelscope" translatable="true">魔搭社区（ModelScope）</string>
   <string name="keepalive_title" translatable="true">保活设置</string>
   <string name="keepalive_desc" translatable="true">服务运行在后台时，开启以下设置可避免被系统/厂商杀后台，保证接口随时可调用。</string>
+  <string name="api_server_notification_content_keepalive" translatable="true">正在后台保持 app 驻留。点击打开。</string>
   <string name="keepalive_notification_granted" translatable="true">通知权限：已授予</string>
   <string name="keepalive_notification_missing" translatable="true">通知权限：未授予</string>
   <string name="keepalive_notification_action" translatable="true">申请通知权限</string>

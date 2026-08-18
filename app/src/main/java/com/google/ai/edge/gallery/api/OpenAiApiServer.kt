@@ -27,6 +27,7 @@ import com.google.ai.edge.gallery.agent.AiChatExecutor
 import com.google.ai.edge.gallery.agent.Attachment
 import com.google.ai.edge.gallery.data.BuiltInTaskId
 import com.google.ai.edge.gallery.data.Model
+import com.google.ai.edge.gallery.data.KeepAliveStore
 import com.google.ai.edge.gallery.keepalive.ApiServerService
 import com.google.ai.edge.gallery.runtime.runtimeHelper
 import com.google.ai.edge.litertlm.Content
@@ -138,24 +139,33 @@ constructor(
       Log.w(TAG, "Server already running")
       return baseUrl()
     }
-    return try {
+    try {
       super.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
-      Log.d(TAG, "OpenAI-compatible server started on port $port")
-      // Keep the process alive: run the server inside a foreground service with a persistent
-      // notification so it survives the screen being off or the app being backgrounded.
-      ApiServerService.start(context, getActiveModelName())
-      baseUrl()
     } catch (e: Exception) {
       Log.e(TAG, "Failed to start server", e)
-      null
+      return null
     }
+    Log.d(TAG, "OpenAI-compatible server started on port $port")
+    // Keep the process alive: run the server inside a foreground service with a persistent
+    // notification so it survives the screen being off or the app being backgrounded. Enable
+    // independent keep-alive so the app stays resident even after the server stops (until the
+    // process is killed), keeping the local API reachable without a cold start. This is
+    // best-effort and independent of the server's own start result.
+    try {
+      KeepAliveStore.setEnabled(context, true)
+      ApiServerService.start(context, getActiveModelName())
+    } catch (e: Exception) {
+      Log.w(TAG, "Failed to start keep-alive service", e)
+    }
+    return baseUrl()
   }
 
   /** Stops the HTTP server. Safe to call even if it is not running. */
   fun stopServer() {
+    // Independent keep-alive stays on after the server stops (until the process is killed), so the
+    // foreground service keeps the app resident and the local API reachable without a cold start.
+    // We therefore do NOT tear down the keep-alive service here.
     if (!isAlive()) {
-      // Still make sure the foreground service is torn down.
-      ApiServerService.stop(context)
       return
     }
     try {
@@ -163,8 +173,11 @@ constructor(
     } catch (e: Exception) {
       Log.w(TAG, "Error stopping server", e)
     }
-    ApiServerService.stop(context)
     Log.d(TAG, "Server stopped")
+    // Keep-alive stays on (until the process is killed), so re-trigger the foreground service so
+    // it rebuilds its notification: with the server no longer running it switches to the
+    // keep-alive-only message instead of the stale "serving" message.
+    ApiServerService.start(context, null)
   }
 
   /** Best-effort base URL of the running server (first private IPv4 found). */

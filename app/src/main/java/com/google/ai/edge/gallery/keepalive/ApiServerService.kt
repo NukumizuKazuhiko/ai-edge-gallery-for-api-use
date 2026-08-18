@@ -27,6 +27,7 @@ import androidx.core.app.NotificationCompat
 import com.google.ai.edge.gallery.MainActivity
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.api.OpenAiApiServer
+import com.google.ai.edge.gallery.data.KeepAliveStore
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -35,15 +36,18 @@ import dagger.hilt.components.SingletonComponent
 /**
  * Keep-alive foreground service.
  *
- * While the local OpenAI-compatible API server is running, this service runs in the foreground so
- * the system does not kill the app: it shows a persistent notification and is combined with the
- * "ignore battery optimizations" + vendor power-management whitelist guidance shown in the API
- * service screen to keep the server reachable even when the screen is off or the app is in the
+ * The service runs in the foreground so the system does not kill the app: it shows a persistent
+ * notification and is combined with the "ignore battery optimizations" + vendor power-management
+ * whitelist guidance shown in the API service screen to keep the app (and, when it is active, the
+ * local OpenAI-compatible API server) reachable even when the screen is off or the app is in the
  * background.
  *
- * The persistent notification is shown ONLY while [OpenAiApiServer] is actually running. If the
- * system restarts this service without the server being alive (e.g. a stale START_STICKY
- * restart), the service shuts itself down silently instead of showing a misleading notification.
+ * The service is driven entirely by the API server lifecycle: [OpenAiApiServer.startServer]
+ * enables independent keep-alive ([KeepAliveStore.isEnabled]) and starts this service. Once
+ * enabled, keep-alive persists until the process is killed by the user or the system, so the local
+ * server becomes reachable again without a cold start. If the service is ever started while
+ * keep-alive is not enabled (e.g. a stale START_STICKY restart), it shuts itself down silently
+ * instead of showing a misleading notification.
  */
 class ApiServerService : Service() {
 
@@ -59,17 +63,20 @@ class ApiServerService : Service() {
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-    // Only keep the persistent notification while the API server is actually running. When the
-    // system restarts this service without the server alive, stop immediately instead of showing
-    // a notification for a server that is not reachable.
-    if (!apiServer.isRunning) {
-      Log.i(TAG, "API server is not running; stopping keep-alive service")
+    // Stay in the foreground only while keep-alive is enabled. Keep-alive is enabled when the user
+    // starts the local API server and stays on until the process is killed, so the app (and its
+    // server) survives backgrounding and the screen being off. A stale restart without keep-alive
+    // enabled stops immediately.
+    if (!shouldKeepAlive()) {
+      Log.i(TAG, "Keep-alive disabled; stopping keep-alive service")
       stopSelf()
       return START_NOT_STICKY
     }
     startForeground(NOTIFICATION_ID, buildNotification(intent?.getStringExtra(EXTRA_MODEL_NAME)))
     return START_STICKY
   }
+
+  private fun shouldKeepAlive(): Boolean = KeepAliveStore.isEnabled(this)
 
   override fun onBind(intent: Intent?): IBinder? = null
 
@@ -110,8 +117,13 @@ class ApiServerService : Service() {
       )
 
     val contentText =
-      if (modelName.isNullOrEmpty()) getString(R.string.api_server_notification_content)
-      else getString(R.string.api_server_notification_content_with_model, modelName)
+      if (apiServer.isRunning) {
+        if (modelName.isNullOrEmpty()) getString(R.string.api_server_notification_content)
+        else getString(R.string.api_server_notification_content_with_model, modelName)
+      } else {
+        // No server running: the notification reflects the independent keep-alive state.
+        getString(R.string.api_server_notification_content_keepalive)
+      }
 
     return NotificationCompat.Builder(this, CHANNEL_ID)
       .setSmallIcon(R.drawable.gemma_logo)
@@ -145,15 +157,6 @@ class ApiServerService : Service() {
         }
       } catch (e: Exception) {
         Log.w(TAG, "Failed to start ApiServerService", e)
-      }
-    }
-
-    /** Stops the keep-alive foreground service. */
-    fun stop(context: Context) {
-      try {
-        context.stopService(Intent(context, ApiServerService::class.java))
-      } catch (e: Exception) {
-        Log.w(TAG, "Failed to stop ApiServerService", e)
       }
     }
   }

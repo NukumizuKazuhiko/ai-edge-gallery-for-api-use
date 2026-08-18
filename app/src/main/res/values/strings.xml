@@ -779,8 +779,9 @@
   <string name="api_server_notification_content_with_model">Model %1$s is serving in the background. Tap to open.</string>
 
   <!-- Keep-alive guidance shown on the API server screen. -->
-  <string name="keepalive_title">Keep-alive settings</string>
-  <string name="keepalive_desc">When the server runs in the background, enabling the options below prevents the system / vendor from killing it, keeping the API callable at any time.</string>
+  <string name="keepalive_title" translatable="true" description="Title of the keep-alive section in the API service settings screen. [CHAR_LIMIT=30]">Keep-alive settings</string>
+  <string name="keepalive_desc" translatable="true" description="Description of the keep-alive section explaining that the options prevent the system/vendor from killing the app. [CHAR_LIMIT=110]">When the server runs in the background, enabling the options below prevents the system / vendor from killing it, keeping the API callable at any time.</string>
+  <string name="api_server_notification_content_keepalive" translatable="true" description="Persistent notification content shown while the app is kept alive in the background with no API server running. [CHAR_LIMIT=60]">Keeping the app alive in the background. Tap to open.</string>
   <string name="keepalive_battery_opt_ok">Battery optimization ignored</string>
   <string name="keepalive_battery_opt_missing">Battery optimization not ignored</string>
   <string name="keepalive_battery_opt_action">Ignore battery optimization</string>
