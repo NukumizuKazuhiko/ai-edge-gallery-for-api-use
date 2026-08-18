@@ -46,6 +46,9 @@ object ModelDownloadSourceStore {
     }
   }
 
+  /** Convenience check for whether the ModelScope download source is currently selected. */
+  fun isModelScope(context: Context): Boolean = get(context) == ModelDownloadSource.MODELSCOPE
+
   fun set(context: Context, source: ModelDownloadSource) {
     val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     prefs.edit().putString(KEY_DOWNLOAD_SOURCE, source.toPrefValue()).apply()
@@ -83,6 +86,9 @@ object ModelScopeUrlMapper {
     val fileName = SUPPORTED_MODEL_NAMES[modelName] ?: return null
     return "https://modelscope.cn/models/$MODELSCOPE_MODEL/resolve/$MODELSCOPE_REVISION/$fileName"
   }
+
+  /** Whether [modelName] is mirrored on ModelScope (and thus can be downloaded from there). */
+  fun isModelMirrored(modelName: String): Boolean = SUPPORTED_MODEL_NAMES.containsKey(modelName)
 
   /** Whether [url] points at a ModelScope download (and thus needs the ModelScope referer). */
   fun isModelScopeUrl(url: String): Boolean {

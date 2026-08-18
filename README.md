@@ -17,6 +17,13 @@
 - 🌐 **下载源切换**：设置里可选择「原生直连（Hugging Face）」或「魔搭社区（ModelScope）」。切换到魔搭后，Gemma 4 E2B / E4B 模型从国内镜像 [venshell/gemma-4-it-litert-lm](https://www.modelscope.cn/models/venshell/gemma-4-it-litert-lm) 下载，无需科学上网；未镜像的模型自动回退到原生直连。
 - ⚡ **多线程分片下载**：魔搭源下将文件分成 4 段并行 Range 下载，实测速度约 26 MB/s（单连接约 1.7 MB/s），大幅减少掉速波动，下载体验接近原生直连。
 
+**文档规范：** 项目文档编写、命名、结构与维护遵循 [docs/DOCUMENTATION_STANDARDS.md](docs/DOCUMENTATION_STANDARDS.md)。
+
+> **关于上游文档：** 本仓库仅发布 Android 应用源码。上游附带的部分本地文件
+> （`CONTRIBUTING.md`、`DEVELOPMENT.md`、`ANDROID_API_README.md` 等）及本地工作区产物
+> （`models/`、`skills/`、`mcp/` 等）已被 `.gitignore` 排除，不随仓库分发；如需查阅请访问
+> [上游仓库](https://github.com/google-ai-edge/gallery)。
+
 ## 致谢 / Acknowledgments
 
 本项目是对以下开源项目的精简与改造，向所有上游开发者与贡献者致以诚挚谢意：

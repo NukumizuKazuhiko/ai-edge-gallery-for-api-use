@@ -45,7 +45,6 @@ import com.google.ai.edge.gallery.data.KEY_MODEL_START_UNZIPPING
 import com.google.ai.edge.gallery.data.KEY_MODEL_TOTAL_BYTES
 import com.google.ai.edge.gallery.data.KEY_MODEL_UNZIPPED_DIR
 import com.google.ai.edge.gallery.data.KEY_MODEL_URL
-import com.google.ai.edge.gallery.data.ModelDownloadSource
 import com.google.ai.edge.gallery.data.ModelDownloadSourceStore
 import com.google.ai.edge.gallery.data.ModelScopeUrlMapper
 import com.google.ai.edge.gallery.data.TMP_FILE_EXT
@@ -107,7 +106,7 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
   }
 
   override suspend fun doWork(): Result {
-    var fileUrl = inputData.getString(KEY_MODEL_URL)
+    val originalUrl = inputData.getString(KEY_MODEL_URL)
     val modelName = inputData.getString(KEY_MODEL_NAME) ?: "Model"
     val version = inputData.getString(KEY_MODEL_COMMIT_HASH)!!
     val fileName = inputData.getString(KEY_MODEL_DOWNLOAD_FILE_NAME)
@@ -121,11 +120,16 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
     val totalBytes = inputData.getLong(KEY_MODEL_TOTAL_BYTES, 0L)
     val accessToken = inputData.getString(KEY_MODEL_DOWNLOAD_ACCESS_TOKEN)
 
-    // Rewrite download URLs when the user has chosen the ModelScope (魔搭社区) download source.
-    // Unmirrored models keep their original (Hugging Face) URL automatically.
-    if (ModelDownloadSourceStore.get(applicationContext) == ModelDownloadSource.MODELSCOPE) {
-      ModelScopeUrlMapper.resolveModelScopeUrl(modelName)?.let { fileUrl = it }
-    }
+    // Rewrite the download URL when the user has chosen the ModelScope (魔搭社区) download source.
+    // Unmirrored models keep their original (Hugging Face) URL automatically. Note: extra data
+    // files are intentionally left untouched — the ModelScope mirror only hosts the single
+    // Gemma-4 E2B / E4B model file, so any extra files (unmirrored models) must keep their HF URL.
+    val fileUrl =
+      if (ModelDownloadSourceStore.isModelScope(applicationContext)) {
+        ModelScopeUrlMapper.resolveModelScopeUrl(modelName) ?: originalUrl
+      } else {
+        originalUrl
+      }
 
     return withContext(Dispatchers.IO) {
       if (fileUrl == null || fileName == null) {
@@ -290,7 +294,14 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
     }
   }
 
-  /** Probes the exact size of a remote file via a `Range: bytes=0-0` request. */
+  /**
+   * Probes the exact size of a remote file via a `Range: bytes=0-0` request.
+   *
+   * Only a `206 Partial Content` response confirms the server honors range requests (required for
+   * segmented download). A plain `200 OK` means the server ignored the range and would send the
+   * whole file for every segment; in that case `-1` is returned so the caller falls back to a
+   * single connection.
+   */
   private fun probeFileSize(url: String, accessToken: String?): Long {
     return try {
       val connection = URL(url).openConnection() as HttpURLConnection
@@ -300,20 +311,13 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
       }
       connection.setRequestProperty("Range", "bytes=0-0")
       connection.connect()
-      if (
-        connection.responseCode != HttpURLConnection.HTTP_PARTIAL &&
-          connection.responseCode != HttpURLConnection.HTTP_OK
-      ) {
+      if (connection.responseCode != HttpURLConnection.HTTP_PARTIAL) {
+        Log.w(TAG, "Probe of $url returned HTTP ${connection.responseCode}; range not supported")
         connection.disconnect()
         return -1L
       }
       val contentRange = connection.getHeaderField("Content-Range")
-      val size =
-        if (contentRange != null) {
-          contentRange.substringAfter("/").toLongOrNull() ?: -1L
-        } else {
-          connection.contentLength.toLong()
-        }
+      val size = contentRange?.substringAfter("/")?.toLongOrNull() ?: -1L
       connection.disconnect()
       size
     } catch (e: Exception) {
@@ -332,11 +336,15 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
   ) {
     val segSize = (fileSize + SEGMENT_COUNT - 1) / SEGMENT_COUNT
     val segments =
-      (0 until SEGMENT_COUNT).map { i ->
-        val start = i * segSize
-        val end = minOf(start + segSize, fileSize) - 1
-        DownloadSegment(index = i, start = start, end = end)
-      }
+      (0 until SEGMENT_COUNT)
+        .map { i ->
+          val start = i * segSize
+          val end = minOf(start + segSize, fileSize) - 1
+          DownloadSegment(index = i, start = start, end = end)
+        }
+        // A file smaller than the segment size leaves empty trailing ranges; drop them so the
+        // download only contains valid (start <= end) segments.
+        .filter { it.start <= it.end }
 
     val segDir = File(outputTmpFile.parentFile, "${outputTmpFile.name}.parts")
     if (!segDir.exists()) {
@@ -362,21 +370,31 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
         .awaitAll()
     }
 
-    // Merge all segments into the tmp file.
+    // Merge all segments into the tmp file, verifying every part is complete first.
     val outputStream = FileOutputStream(outputTmpFile)
     outputStream.use { fos ->
       for (seg in segments) {
         val part = File(segDir, "part_${seg.index}")
-        if (part.exists()) {
-          part.inputStream().use { ins -> ins.copyTo(fos, DEFAULT_BUFFER_SIZE) }
+        val expectedSize = seg.end - seg.start + 1
+        if (part.length() != expectedSize) {
+          throw IOException(
+            "Part ${seg.index} incomplete: expected $expectedSize bytes, got ${part.length()}"
+          )
         }
+        part.inputStream().use { ins -> ins.copyTo(fos, DEFAULT_BUFFER_SIZE) }
       }
     }
     segDir.deleteRecursively()
     Log.d(TAG, "Segmented download of ${file.fileName} merged")
   }
 
-  /** Downloads one byte range to its part file, resuming if the part file already exists. */
+  /**
+   * Downloads one byte range to its part file, resuming if the part file already exists.
+   *
+   * Only a `206 Partial Content` response is accepted; a `200 OK` means the server ignored the
+   * `Range` header and would write the whole file into every part file, corrupting the merged
+   * result.
+   */
   private suspend fun downloadSegment(
     url: String,
     seg: DownloadSegment,
@@ -385,43 +403,55 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
     progress: ProgressReporter,
   ) {
     val partFile = File(segDir, "part_${seg.index}")
-    val start = seg.start + partFile.length()
+    val existingBytes = partFile.length()
+    val start = seg.start + existingBytes
     // Segment already fully downloaded (e.g. resumed from a previous run).
     if (start > seg.end) {
       progress.downloadedBytes.addAndGet(seg.end - seg.start + 1)
       return
     }
+    // Count already-downloaded bytes of this part towards the overall progress.
+    if (existingBytes > 0) {
+      progress.downloadedBytes.addAndGet(existingBytes)
+    }
 
     val connection = URL(url).openConnection() as HttpURLConnection
-    connection.setRequestProperty("Referer", ModelScopeUrlMapper.referer())
-    if (accessToken != null) {
-      connection.setRequestProperty("Authorization", "Bearer $accessToken")
-    }
-    connection.setRequestProperty("Range", "bytes=$start-${seg.end}")
-    // Force the server to send non-compressed data to make range downloads work.
-    connection.setRequestProperty("Accept-Encoding", "identity")
-    connection.connect()
+    try {
+      connection.setRequestProperty("Referer", ModelScopeUrlMapper.referer())
+      if (accessToken != null) {
+        connection.setRequestProperty("Authorization", "Bearer $accessToken")
+      }
+      connection.setRequestProperty("Range", "bytes=$start-${seg.end}")
+      // Force the server to send non-compressed data to make range downloads work.
+      connection.setRequestProperty("Accept-Encoding", "identity")
+      connection.connect()
 
-    if (
-      connection.responseCode != HttpURLConnection.HTTP_PARTIAL &&
-        connection.responseCode != HttpURLConnection.HTTP_OK
-    ) {
+      if (connection.responseCode != HttpURLConnection.HTTP_PARTIAL) {
+        throw IOException(
+          "Server ignored Range request (HTTP ${connection.responseCode}) for segment ${seg.index}"
+        )
+      }
+
+      val inputStream = connection.inputStream
+      try {
+        val outputStream = RandomAccessFile(partFile, "rw")
+        try {
+          outputStream.seek(existingBytes)
+          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+          var bytesRead: Int
+          while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+            outputStream.write(buffer, 0, bytesRead)
+            progress.report(bytesRead)
+          }
+        } finally {
+          outputStream.close()
+        }
+      } finally {
+        inputStream.close()
+      }
+    } finally {
       connection.disconnect()
-      throw IOException("HTTP error code: ${connection.responseCode} for segment ${seg.index}")
     }
-
-    val inputStream = connection.inputStream
-    val outputStream = RandomAccessFile(partFile, "rw")
-    outputStream.seek(partFile.length())
-    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-    var bytesRead: Int
-    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-      outputStream.write(buffer, 0, bytesRead)
-      progress.report(bytesRead)
-    }
-    outputStream.close()
-    inputStream.close()
-    connection.disconnect()
   }
 
   /** Downloads a single file over a single HTTP connection (non-ModelScope source). */
@@ -457,9 +487,14 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
     Log.d(TAG, "response code: ${connection.responseCode}")
 
     if (
-      connection.responseCode == HttpURLConnection.HTTP_OK ||
-        connection.responseCode == HttpURLConnection.HTTP_PARTIAL
+      connection.responseCode != HttpURLConnection.HTTP_OK &&
+        connection.responseCode != HttpURLConnection.HTTP_PARTIAL
     ) {
+      connection.disconnect()
+      throw IOException("HTTP error code: ${connection.responseCode}")
+    }
+
+    try {
       val contentRange = connection.getHeaderField("Content-Range")
       if (contentRange != null) {
         val rangeParts = contentRange.substringAfter("bytes ").split("/")
@@ -469,22 +504,26 @@ class DownloadWorker(context: Context, params: WorkerParameters) :
       } else {
         Log.d(TAG, "Download starts from beginning.")
       }
-    } else {
-      connection.disconnect()
-      throw IOException("HTTP error code: ${connection.responseCode}")
-    }
 
-    val inputStream = connection.inputStream
-    val outputStream = FileOutputStream(outputTmpFile, true /* append */)
-    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-    var bytesRead: Int
-    while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-      outputStream.write(buffer, 0, bytesRead)
-      progress.report(bytesRead)
+      val inputStream = connection.inputStream
+      try {
+        val outputStream = FileOutputStream(outputTmpFile, true /* append */)
+        try {
+          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+          var bytesRead: Int
+          while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+            outputStream.write(buffer, 0, bytesRead)
+            progress.report(bytesRead)
+          }
+        } finally {
+          outputStream.close()
+        }
+      } finally {
+        inputStream.close()
+      }
+    } finally {
+      connection.disconnect()
     }
-    outputStream.close()
-    inputStream.close()
-    connection.disconnect()
   }
 
   override suspend fun getForegroundInfo(): ForegroundInfo {
