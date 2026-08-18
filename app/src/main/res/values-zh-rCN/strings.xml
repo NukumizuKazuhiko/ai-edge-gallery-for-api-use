@@ -78,6 +78,9 @@
   <string name="config_label_prefill_tokens" translatable="true">Prefill Token 数</string>
   <string name="config_label_decode_tokens" translatable="true">Decode Token 数</string>
   <string name="config_label_number_of_runs" translatable="true">运行次数</string>
+  <string name="config_label_show_3d_spinner" translatable="true">图像生成时显示 3D 旋转指示器</string>
+  <string name="config_label_font_size" translatable="true">字体大小</string>
+  <string name="config_label_max_char_count" translatable="true">最大字符数</string>
 
   <!-- 下载首页 -->
   <string name="home_subtitle" translatable="true">模型下载 · 本地 API 服务</string>
@@ -152,7 +155,7 @@
   <string name="keepalive_battery_opt_missing" translatable="true">电池优化：未忽略</string>
   <string name="keepalive_battery_opt_action" translatable="true">忽略电池优化</string>
   <string name="keepalive_vendor_action" translatable="true">电源管理 / 后台运行白名单</string>
-  <string name="keepalive_battery_behavior_desc" translatable="true">耗电行为（OPPO / 一加等）：请选择「完全允许后台行为」，否则后台仍可能被限制。</string>
+  <string name="keepalive_battery_behavior_desc" translatable="true">耗电行为（OPPO / OnePlus 等）：请选择「完全允许后台行为」，否则后台仍可能被限制。</string>
   <string name="keepalive_battery_behavior_action" translatable="true">申请完全允许后台行为</string>
   <string name="toast_open_battery_settings_failed" translatable="true">无法打开电池优化设置</string>
   <string name="toast_power_mgmt_not_found" translatable="true">未找到电源管理设置</string>

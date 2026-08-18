@@ -1,4 +1,4 @@
-﻿<!--
+<!--
  Copyright 2025 Google LLC
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -791,7 +791,6 @@
   <!-- ============ Fork-specific screens (download home, API server, settings) ============ -->
   <!-- Model download home page. -->
   <string name="home_subtitle" translatable="true" description="Subtitle under the app title on the model download home page. [CHAR_LIMIT=30]">Model downloads · Local API service</string>
-  <string name="home_loading_model_list" translatable="true" description="Loading message shown on the model download home page while the model list is being fetched. [CHAR_LIMIT=24]">Loading model list…</string>
   <string name="home_empty_model_list" translatable="true" description="Empty-state message on the model download home page telling the user to refresh or import a model. [CHAR_LIMIT=90]">No models available. Check your network and tap refresh in the top-right corner, or tap + in the bottom-right corner to import a local model.</string>
 
   <!-- API server screen. -->

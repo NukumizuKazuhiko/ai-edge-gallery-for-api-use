@@ -107,6 +107,9 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
 
   // --- App language ---
   var appLocale by remember { mutableStateOf(AppLocaleStore.get(context)) }
+  // Guards against a second tap while the language-switch recreate is in flight. Without this, a
+  // second click would consume `skipSplashOnNextCreate` and fall back to the 1s-splash path.
+  var isSwitchingLocale by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     refreshKeepAliveState()
@@ -170,35 +173,29 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
               AppLocale.EN to stringResource(R.string.settings_language_en),
             )
           localeOptions.forEach { (locale, label) ->
+            // Shared by the row's selectable and the inner RadioButton to avoid duplicated logic.
+            val onLocaleSelected: () -> Unit = {
+              if (!isSwitchingLocale && locale != appLocale) {
+                isSwitchingLocale = true
+                appLocale = locale
+                AppLocaleStore.set(context, locale)
+                // Recreate the activity so every screen re-inflates its resources with the new
+                // locale. Skip the startup splash to avoid a blank flash during the recreate.
+                // attachBaseContext applies the stored locale on the next launch.
+                MainActivity.skipSplashOnNextCreate = true
+                (context as? ComponentActivity)?.recreate()
+              }
+            }
             Row(
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.spacedBy(8.dp),
               modifier =
                 Modifier
                   .fillMaxWidth()
-                  .selectable(
-                    selected = appLocale == locale,
-                    onClick = {
-                      appLocale = locale
-                      AppLocaleStore.set(context, locale)
-                      // Recreate the activity so every screen re-inflates its resources with the
-                      // new locale. Skip the startup splash to avoid a blank flash during the
-                      // recreate. attachBaseContext applies the stored locale on the next launch.
-                      MainActivity.skipSplashOnNextCreate = true
-                      (context as? ComponentActivity)?.recreate()
-                    },
-                  )
+                  .selectable(selected = appLocale == locale, onClick = onLocaleSelected)
                   .padding(vertical = 4.dp),
             ) {
-              RadioButton(
-                selected = appLocale == locale,
-                onClick = {
-                  appLocale = locale
-                  AppLocaleStore.set(context, locale)
-                  MainActivity.skipSplashOnNextCreate = true
-                  (context as? ComponentActivity)?.recreate()
-                },
-              )
+              RadioButton(selected = appLocale == locale, onClick = onLocaleSelected)
               Text(label, style = MaterialTheme.typography.bodyMedium)
             }
           }

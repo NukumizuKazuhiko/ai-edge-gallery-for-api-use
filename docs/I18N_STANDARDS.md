@@ -41,6 +41,10 @@
 - 切换语言后 `MainActivity.recreate()` 重建 Activity 使 `stringResource` 立即生效；
   重建前设置 `MainActivity.skipSplashOnNextCreate`，跳过启动 splash 并应用
   `Theme.Gallery`（避免闪白屏与残留 ActionBar）。
+- `MainActivity.skipSplashOnNextCreate` 是进程级静态标志，仅在语言切换的 `recreate()`
+  前由设置页写入，并在 `MainActivity.onCreate` 开头读取后立即清零（一次性消费）。
+  若 `recreate()` 未发生（如上下文转型失败），标志会在下次冷启动时被消费导致跳过
+  splash——设置页用 `isSwitchingLocale` 状态保证同一语言仅触发一次 recreate。
 - 选择「跟随系统」时 `applyLocale()` 原样返回 base context，完全跟随系统。
 
 **新增一种语言时**：在 `values/strings.xml` 之后新建 `values-<locale>/strings.xml`
@@ -87,7 +91,9 @@
 规则：
 
 - key 只描述文案含义（`home_empty_model_list`），不携带语言或页面编号。
-- 每条资源必须写 `description`，说明用途与占位符含义（如 `%1$s`）。
+- 每条资源必须写 `description`，说明用途与占位符含义（如 `%1$s`）。**默认语言
+  `values/strings.xml` 必须写**；`values-zh-rCN/strings.xml` 等翻译文件是纯覆盖，
+  允许省略 `description`（不重复默认语言的描述）。
 - 占位符用 `%1$s`（字符串）与 `%1$d`（数字）；`%s` 仅限单占位符且与上游一致。
 - 文本中的引号 / 反斜杠用 XML 转义（`&quot;`、`&lt;`、`\\`），内容中含 `<` 时用 `&lt;`。
 
