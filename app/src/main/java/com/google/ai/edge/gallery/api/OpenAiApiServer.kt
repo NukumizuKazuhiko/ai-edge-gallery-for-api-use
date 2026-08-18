@@ -124,6 +124,15 @@ constructor(
   /** The name of the model currently being served, or null if none was set. */
   fun getActiveModelName(): String? = activeModel?.name
 
+  /**
+   * The model name exposed to API clients, without the import file extension.
+   *
+   * Imported models use the source file name (e.g. `foo.litertlm`) as their internal [Model.name].
+   * API responses (`/v1/models` id, chat `model` field) present the cleaned-up display name instead
+   * so clients never see the `.litertlm` suffix.
+   */
+  private fun apiModelName(model: Model): String = model.displayName.ifEmpty { model.name }
+
   /** The base URL if the server is running, or null otherwise. */
   fun currentBaseUrl(): String? = if (isAlive()) baseUrl() else null
 
@@ -271,7 +280,7 @@ constructor(
 
   /** Serializes a model into an OpenAI `model` list entry. */
   private fun modelEntryJson(model: Model): String {
-    return "{\"id\":\"${escapeJson(model.name)}\",\"object\":\"model\"," +
+    return "{\"id\":\"${escapeJson(apiModelName(model))}\",\"object\":\"model\"," +
       "\"created\":${System.currentTimeMillis() / 1000},\"owned_by\":\"local\"}"
   }
 
@@ -298,7 +307,7 @@ constructor(
     }
 
     val body = readRequestBody(session)
-    val request = parseChatRequest(body, model.name)
+    val request = parseChatRequest(body, apiModelName(model))
     if (request == null) {
       lastDiagnostics = RequestDiagnostics(error = "Invalid request body")
       return jsonError(Response.Status.BAD_REQUEST, "Invalid request body")
@@ -670,17 +679,17 @@ constructor(
             is AgentEvent.StreamToken -> {
               lastDiagnostics.streamTokenEvents++
               if (event.token.isNotEmpty()) {
-                sse.append("data: ").append(chunkJson(model.name, event.token, finish = null)).append("\n\n")
+                sse.append("data: ").append(chunkJson(apiModelName(model), event.token, finish = null)).append("\n\n")
               }
             }
             is AgentEvent.ToolCalls -> {
               lastDiagnostics.toolCallEvents++
               toolCalls.addAll(event.toolCalls)
-              sse.append("data: ").append(toolCallChunkJson(model.name, event.toolCalls)).append("\n\n")
+              sse.append("data: ").append(toolCallChunkJson(apiModelName(model), event.toolCalls)).append("\n\n")
             }
             is AgentEvent.LoopTerminated -> {
               val finish = if (toolCalls.isNotEmpty()) "tool_calls" else "stop"
-              sse.append("data: ").append(chunkJson(model.name, "", finish = finish)).append("\n\n")
+              sse.append("data: ").append(chunkJson(apiModelName(model), "", finish = finish)).append("\n\n")
               sse.append("data: [DONE]\n\n")
             }
             is AgentEvent.Error -> {
@@ -768,13 +777,13 @@ constructor(
 
     // The model decided to call tools: hand the calls back to the client for execution.
     if (toolCalls.isNotEmpty()) {
-      return jsonResponse(Response.Status.OK, toolCallsBody(model.name, request.prompt, toolCalls))
+      return jsonResponse(Response.Status.OK, toolCallsBody(apiModelName(model), request.prompt, toolCalls))
     }
 
     val content = escapeJson(collected.toString())
     val body =
       "{\"id\":\"chatcmpl-local\",\"object\":\"chat.completion\"," +
-        "\"created\":${System.currentTimeMillis() / 1000},\"model\":\"${escapeJson(model.name)}\"," +
+        "\"created\":${System.currentTimeMillis() / 1000},\"model\":\"${escapeJson(apiModelName(model))}\"," +
         "\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"$content\"}," +
         "\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":${request.prompt.length / 4}," +
         "\"completion_tokens\":${collected.length / 4},\"total_tokens\":${(request.prompt.length + collected.length) / 4}}}"

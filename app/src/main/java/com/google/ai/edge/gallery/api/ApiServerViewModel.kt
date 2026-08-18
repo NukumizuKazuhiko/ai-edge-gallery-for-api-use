@@ -55,7 +55,7 @@ constructor(
     // background.
     if (server.isRunning) {
       _baseUrl.value = server.currentBaseUrl()
-      _activeModelName.value = server.getActiveModelName()
+      _activeModelName.value = server.getActiveModelName()?.removeSuffix(".litertlm")
     }
   }
 
@@ -83,7 +83,7 @@ constructor(
   /** Points the server at the given model and task, then starts it. */
   fun start(model: Model, taskId: String): String? {
     server.setActiveModel(model, taskId)
-    _activeModelName.value = model.name
+    _activeModelName.value = model.displayName.ifEmpty { model.name }
     val url = server.startServer()
     _isRunning.value = server.isRunning
     _baseUrl.value = url
