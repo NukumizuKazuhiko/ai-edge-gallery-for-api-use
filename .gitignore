@@ -32,16 +32,7 @@ local.properties
 .kotlin
 
 # Release signing keys (never commit).
-/keystore/
+/local/keystore/
 
 # Local workspace artifacts not part of this repo's release source.
-/mcp/
-/models/
-/skills/
-/model_allowlists/
-/ANDROID_API_README.md
-/Bug_Reporting_Guide.md
-/CONTRIBUTING.md
-/DEVELOPMENT.md
-/Function_Calling_Guide.md
-/model_allowlist.json
+/local/
