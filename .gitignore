@@ -31,6 +31,9 @@
 local.properties
 .kotlin
 
+# Release signing keys (never commit).
+/keystore/
+
 # Local workspace artifacts not part of this repo's release source.
 /mcp/
 /models/
