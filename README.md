@@ -8,7 +8,7 @@
 **新增 / 保留功能：**
 
 - 🔌 **OpenAI 兼容 API**：`POST /v1/chat/completions`，支持流式（SSE）与非流式
-- 📋 **自动模型列表**：`GET /v1/models` 自动返回 App 当前已下载的全部模型
+- 📋 **模型声明**：`GET /v1/models` 仅声明 App 当前正在运行的单个模型（启动 API 服务时指定），不列出未运行的已下载模型
 - 🔐 **Bearer Token 鉴权**：可选，设置后未带 token 的请求返回 401
 - 🖼️ **图片理解**：支持多模态模型，通过 `image_url`（base64）传图
 - ⏳ **请求排队**：并发请求自动排队
@@ -16,7 +16,7 @@
 - ⚡ **保活设置**：通知权限、忽略电池优化、厂商电源管理白名单，避免后台被杀
 - 🌐 **下载源切换**：设置里可选择「原生直连（Hugging Face）」或「魔搭社区（ModelScope）」。切换到魔搭后，Gemma 4 E2B / E4B 模型从国内镜像 [venshell/gemma-4-it-litert-lm](https://www.modelscope.cn/models/venshell/gemma-4-it-litert-lm) 下载，无需科学上网；未镜像的模型自动回退到原生直连。
 - ⚡ **多线程分片下载**：魔搭源下将文件分成 4 段并行 Range 下载，实测速度约 26 MB/s（单连接约 1.7 MB/s），大幅减少掉速波动，下载体验接近原生直连。
-- 📂 **导入本地模型**：点击首页右下角 `+` 按钮可从本机导入 `.litertlm` 格式的模型文件（仅支持该格式，其他格式会被拒绝）。导入后可编辑加速器（默认 GPU）、采样参数等，模型会出现在首页「Imported models」分组，并自动接入本地 API 服务的 `/v1/models` 列表。此功能用于加载自转换 / 自收集的 LiteRT-LM 模型（例如用 [LiteRT-LM 转换工具链](https://ai.google.dev/edge/litert-lm) 从 GGUF 等格式转换出的产物）。
+- 📂 **导入本地模型**：点击首页右下角 `+` 按钮可从本机导入 `.litertlm` 格式的模型文件（仅支持该格式，其他格式会被拒绝）。导入后可编辑加速器（默认 GPU）、采样参数等，模型会出现在首页「Imported models」分组，并可作为当前运行模型被本地 API 服务的 `/v1/models` 声明。此功能用于加载自转换 / 自收集的 LiteRT-LM 模型（例如用 [LiteRT-LM 转换工具链](https://ai.google.dev/edge/litert-lm) 从 GGUF 等格式转换出的产物）。
 
 **文档规范：** 项目文档编写、命名、结构与维护遵循 [docs/DOCUMENTATION_STANDARDS.md](docs/DOCUMENTATION_STANDARDS.md)；多语言支持与文案管理遵循 [docs/I18N_STANDARDS.md](docs/I18N_STANDARDS.md)。
 

@@ -70,9 +70,9 @@ private const val DEFAULT_PORT = 8080
  * in the app UI (the user must first download and initialize a model in the chat screen). Only one
  * model is served at a time for chat completions — the one set via [setActiveModel].
  *
- * The list of models advertised by `/v1/models` (and `/v1/chat/completions/models`) is pulled
- * automatically from [ApiModelRegistry], which the app's model manager keeps in sync with the
- * models that are currently downloaded on the device.
+ * The list of models advertised by `/v1/models` (and `/v1/chat/completions/models`) is just the
+ * single model currently being served (see [setActiveModel]); no other downloaded models are
+ * advertised, so clients only ever select a model that is actually running.
  *
  * Supports both streaming (SSE) and non-streaming OpenAI chat completions.
  */
@@ -82,7 +82,6 @@ open class OpenAiApiServer
 constructor(
   @ApplicationContext private val context: Context,
   @AiChatExecutor private val executor: AgentRuntimeExecutor,
-  private val modelRegistry: ApiModelRegistry,
 ) : NanoHTTPD(DEFAULT_PORT) {
   @Volatile private var activeModel: Model? = null
   /** Serializes inference: only one request runs at a time; others block and wait in queue. */
@@ -256,19 +255,15 @@ constructor(
   }
 
   /**
-   * Lists the models currently available on the device: every downloadable LLM model the app
-   * knows about (pulled automatically from [ApiModelRegistry]) plus the currently active model.
+   * Lists the model currently being served by this server (set via [setActiveModel]). Only that one
+   * model is advertised, because the server serves a single model at a time.
    */
   private fun handleModels(): Response {
+    // Advertise only the model currently being served (set via setActiveModel). The server serves
+    // exactly one model at a time, so listing every downloaded model here would mislead clients
+    // into selecting a model that is not actually running.
     val active = getActiveOrNull()
-    val data =
-      buildList {
-        if (active != null) add(active)
-        modelRegistry.getModels().forEach { model ->
-          if (model.name != active?.name) add(model)
-        }
-      }
-    val items = data.joinToString(",") { modelEntryJson(it) }
+    val items = if (active != null) modelEntryJson(active) else ""
     val body = "{\"object\":\"list\",\"data\":[$items]}"
     return jsonResponse(Response.Status.OK, body)
   }

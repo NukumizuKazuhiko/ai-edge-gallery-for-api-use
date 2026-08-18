@@ -24,8 +24,11 @@ import javax.inject.Singleton
  * The app's model library (allowlist models + imported models + download status) is owned by the
  * [com.google.ai.edge.gallery.ui.modelmanager.ModelManagerViewModel]. That ViewModel pushes the
  * latest snapshot of downloadable LLM models here whenever the library changes (allowlist refresh,
- * download, import, delete), and [OpenAiApiServer] reads this registry to answer `/v1/models`
- * automatically — without the server reaching into UI state itself.
+ * download, import, delete).
+ *
+ * NOTE: the local API server no longer reads this registry for `/v1/models` — it advertises only
+ * the single model currently being served. This registry currently has no consumer and is kept
+ * only as the ModelManagerViewModel's model-library snapshot; revisit if it becomes dead code.
  */
 @Singleton
 class ApiModelRegistry
