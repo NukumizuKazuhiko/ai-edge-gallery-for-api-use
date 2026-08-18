@@ -690,7 +690,7 @@ constructor(
     }
   }
 
-  fun addImportedLlmModel(info: ImportedModel) {
+  fun addImportedLlmModel(info: ImportedModel): Boolean {
     Log.d(TAG, "adding imported llm model: $info")
 
     val importsDir = File(context.getExternalFilesDir(null), IMPORTS_DIR)
@@ -698,8 +698,38 @@ constructor(
       importsDir.mkdirs()
     }
 
+    val importedModels = dataStoreRepository.readImportedModels()
+
+    // Reject re-importing a model whose file content already exists (same SHA-256). The file was
+    // already copied by the importing dialog, so remove it before rejecting.
+    val duplicateHash =
+      info.fileSha256.isNotEmpty() &&
+        importedModels.any { it.fileSha256.isNotEmpty() && it.fileSha256 == info.fileSha256 }
+    if (duplicateHash) {
+      Log.w(TAG, "Rejected import: a model with the same SHA-256 is already imported")
+      deleteFilesFromImportDir(info.fileName)
+      return false
+    }
+
+    // Disambiguate duplicate file names by appending (1), (2), ... instead of overwriting an
+    // existing imported model of the same name.
+    val finalFileName = uniqueImportFileName(info.fileName, importedModels.map { it.fileName }.toSet())
+    if (finalFileName != info.fileName) {
+      val oldFile = File(importsDir, info.fileName)
+      val newFile = File(importsDir, finalFileName)
+      if (!oldFile.renameTo(newFile)) {
+        // Keep the on-disk file name and the model name consistent; if we cannot rename, reject
+        // the import rather than create a model whose file path does not match its name.
+        Log.w(TAG, "Failed to rename imported file ${info.fileName} -> $finalFileName")
+        deleteFilesFromImportDir(info.fileName)
+        return false
+      }
+      Log.d(TAG, "Renamed imported file ${info.fileName} -> $finalFileName")
+    }
+    val finalInfo = info.toBuilder().setFileName(finalFileName).build()
+
     // Create model.
-    val model = createModelFromImportedModelInfo(info = info)
+    val model = createModelFromImportedModelInfo(info = finalInfo)
 
     val setOfTasks =
       mutableSetOf(
@@ -712,12 +742,6 @@ constructor(
         BuiltInTaskId.LLM_AGENT_CHAT,
       )
     for (task in getTasksByIds(ids = setOfTasks)) {
-      // Remove duplicated imported model if existed.
-      val modelIndex = task.models.indexOfFirst { info.fileName == it.name && it.imported }
-      if (modelIndex >= 0) {
-        Log.d(TAG, "duplicated imported model found in task. Removing it first")
-        task.models.removeAt(modelIndex)
-      }
       if (
         (task.id == BuiltInTaskId.LLM_ASK_IMAGE && model.llmSupportImage) ||
           (task.id == BuiltInTaskId.LLM_ASK_AUDIO && model.llmSupportAudio) ||
@@ -766,14 +790,23 @@ constructor(
     }
 
     // Add to data store.
-    val importedModels = dataStoreRepository.readImportedModels().toMutableList()
-    val importedModelIndex = importedModels.indexOfFirst { info.fileName == it.fileName }
-    if (importedModelIndex >= 0) {
-      Log.d(TAG, "duplicated imported model found in data store. Removing it first")
-      importedModels.removeAt(importedModelIndex)
+    importedModels.toMutableList().apply {
+      removeAll { it.fileName == finalInfo.fileName }
+      add(finalInfo)
+    }.let { dataStoreRepository.saveImportedModels(importedModels = it) }
+    return true
+  }
+
+  /** Returns a file name that does not collide with [usedNames], appending `(1)`, `(2)`, ... */
+  private fun uniqueImportFileName(fileName: String, usedNames: Set<String>): String {
+    if (fileName !in usedNames) return fileName
+    val base = fileName.removeSuffix(".litertlm")
+    var index = 1
+    while (true) {
+      val candidate = "${base}($index).litertlm"
+      if (candidate !in usedNames) return candidate
+      index++
     }
-    importedModels.add(info)
-    dataStoreRepository.saveImportedModels(importedModels = importedModels)
   }
 
   fun getTokenStatusAndData(): TokenStatusAndData {

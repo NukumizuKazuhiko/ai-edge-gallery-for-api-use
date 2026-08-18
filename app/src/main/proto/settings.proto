@@ -50,6 +50,8 @@ message ImportedModel {
   }
   // Only set for models imported from url.
   string url = 4;
+  // SHA-256 of the imported model file, used to reject re-importing the same model.
+  string file_sha256 = 5;
 }
 
 message LlmConfig {

@@ -101,6 +101,7 @@
   <string name="import_action" translatable="true">导入</string>
   <string name="import_model_hint_message" translatable="true">请上传 .litertlm 格式的模型文件</string>
   <string name="model_imported_success" translatable="true">模型导入成功</string>
+  <string name="model_import_duplicate_message" translatable="true">该模型已导入，无法重复导入</string>
   <string name="failed_to_import" translatable="true">导入失败</string>
   <string name="unsupported_model_title" translatable="true">不支持的模型类型</string>
   <string name="unsupported_file_type_error" translatable="true">仅支持 “.litertlm” 格式的文件。</string>

@@ -362,10 +362,15 @@ fun ModelDownloadHome(
       info = importInfo!!,
       onDismiss = { showImportingDialog = false },
       onDone = { info ->
-        modelManagerViewModel.addImportedLlmModel(info = info)
+        val added = modelManagerViewModel.addImportedLlmModel(info = info)
         showImportingDialog = false
         scope.launch {
-          snackbarHostState.showSnackbar(context.getString(R.string.model_imported_success))
+          snackbarHostState.showSnackbar(
+            context.getString(
+              if (added) R.string.model_imported_success
+              else R.string.model_import_duplicate_message
+            )
+          )
         }
       },
     )

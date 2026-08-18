@@ -551,6 +551,8 @@
   <string name="import_model_hint_message" translatable="true" description="Hint telling the user that only .litertlm model files can be imported. [CHAR_LIMIT=30]">Please upload a .litertlm model file</string>
   <!-- Snackbar message shown after a model has been imported successfully. -->
   <string name="model_imported_success" translatable="true" description="Message shown when a model file has been imported successfully. [CHAR_LIMIT=18]">Model imported successfully</string>
+  <!-- Snackbar message shown when re-importing a model file whose content already exists. -->
+  <string name="model_import_duplicate_message" translatable="true" description="Message shown when the imported model file is a duplicate of an already-imported model. [CHAR_LIMIT=30]">This model is already imported</string>
   <!-- Title of the theme selection setting. -->
   <string name="theme_title" translatable="true" description="Label for the settings section or configuration key where users can choose the visual theme of the app (e.g., Light, Dark). [CHAR_LIMIT=7]">Theme</string>
   <!-- Title of the section for third-party libraries in settings. -->

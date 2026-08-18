@@ -249,7 +249,7 @@ fun ModelImportingDialog(
   var finished by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
-    val copied =
+    val sha256 =
       copyFileToImports(
         context = context,
         fileName = info.fileName,
@@ -258,9 +258,9 @@ fun ModelImportingDialog(
         onProgress = { progress = it },
         onError = { error = it },
       )
-    if (copied) {
+    if (sha256 != null) {
       finished = true
-      onDone(info)
+      onDone(info.toBuilder().setFileSha256(sha256).build())
     }
   }
 
@@ -354,7 +354,7 @@ private suspend fun copyFileToImports(
   uri: Uri,
   onProgress: (Float) -> Unit,
   onError: (String) -> Unit,
-): Boolean = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+): String? = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
   try {
     val importsDir = java.io.File(context.getExternalFilesDir(null), com.google.ai.edge.gallery.data.IMPORTS_DIR)
     if (!importsDir.exists()) {
@@ -364,17 +364,19 @@ private suspend fun copyFileToImports(
     val openedStream = context.contentResolver.openInputStream(uri)
     val inputStream = openedStream ?: run {
       onError(context.getString(R.string.failed_to_import))
-      return@withContext false
+      return@withContext null
     }
     try {
       val outputStream = java.io.FileOutputStream(outputFile)
       try {
+        val digest = java.security.MessageDigest.getInstance("SHA-256")
         val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
         var bytesRead: Int
         var importedBytes = 0L
         var lastSetProgressTs = 0L
         while (inputStream.read(buffer).also { bytesRead = it } != -1) {
           outputStream.write(buffer, 0, bytesRead)
+          digest.update(buffer, 0, bytesRead)
           importedBytes += bytesRead
           val curTs = System.currentTimeMillis()
           if (curTs - lastSetProgressTs > 200) {
@@ -384,20 +386,20 @@ private suspend fun copyFileToImports(
             }
           }
         }
+        onProgress(1f)
+        digest.digest().joinToString("") { "%02x".format(it) }
       } finally {
         outputStream.close()
       }
     } finally {
       inputStream.close()
     }
-    onProgress(1f)
-    true
   } catch (e: CancellationException) {
     throw e
   } catch (e: Exception) {
     Log.e(TAG, "Failed to import model $fileName", e)
     onError(context.getString(R.string.failed_to_import))
-    false
+    null
   }
 }
 
