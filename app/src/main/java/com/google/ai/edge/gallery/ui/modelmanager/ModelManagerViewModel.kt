@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.ai.edge.gallery.AppLifecycleProvider
 import com.google.ai.edge.gallery.BuildConfig
 import com.google.ai.edge.gallery.R
+import com.google.ai.edge.gallery.api.OpenAiApiServer
 import com.google.ai.edge.gallery.common.ProjectConfig
 import com.google.ai.edge.gallery.common.SystemPromptHelper
 import com.google.ai.edge.gallery.common.getJsonResponse
@@ -206,6 +207,7 @@ constructor(
   private val customTasks: Set<@JvmSuppressWildcards CustomTask>,
   private val systemPromptRepository: SystemPromptRepository,
   private val huggingFaceApiClient: HuggingFaceApiClient,
+  private val apiServer: OpenAiApiServer,
   @ApplicationContext private val context: Context,
 ) :
   ViewModel()
@@ -442,6 +444,23 @@ constructor(
     onError: (String) -> Unit = {},
   ) {
     viewModelScope.launch {
+      // If this model is already being served by the local API server it is initialized and
+      // online. Navigating back to the API page of the same model (or into the same model from
+      // anywhere) must not re-initialize it — that would tear down and reload the served model and
+      // interrupt the running server. Skip straight to reporting it as ready.
+      if (apiServer.isServingModel(model.name)) {
+        Log.d(
+          TAG,
+          "Model '${model.name}' is already being served by the API server; skipping re-initialization.",
+        )
+        updateModelInitializationStatus(
+          model = model,
+          status = ModelInitializationStatusType.INITIALIZED,
+        )
+        onDone()
+        return@launch
+      }
+
       // Skip if initialized already.
       if (
         !force &&
@@ -525,6 +544,17 @@ constructor(
     instanceToCleanUp: Any? = model.instance,
     onDone: () -> Unit = {},
   ) {
+    // Keep the model resident while the local API server is serving it, so leaving the API page,
+    // switching models or any other cleanup path never tears the served model down. The server
+    // answers /v1/chat/completions from the model's live instance, so it must stay initialized
+    // regardless of where the user navigates in the app. When the server is later stopped,
+    // isServingModel() returns false and cleanup proceeds normally.
+    if (apiServer.isServingModel(model.name)) {
+      Log.d(TAG, "Model '${model.name}' is being served by the API server; keeping it online.")
+      onDone()
+      return
+    }
+
     if (instanceToCleanUp != null && instanceToCleanUp !== model.instance) {
       Log.d(TAG, "Stale cleanup request for ${model.name}. Aborting.")
       onDone()

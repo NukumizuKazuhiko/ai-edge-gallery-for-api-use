@@ -23,10 +23,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -37,6 +39,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -91,6 +94,8 @@ fun ModelDownloadHome(
   onModelSelected: (Model) -> Unit,
   onApiServerClicked: () -> Unit,
   onSettingsClicked: () -> Unit,
+  showReturnToApiServer: Boolean = false,
+  onReturnToApiServer: () -> Unit = {},
 ) {
   val uiState by modelManagerViewModel.uiState.collectAsState()
   val context = LocalContext.current
@@ -228,34 +233,56 @@ fun ModelDownloadHome(
       )
     },
     floatingActionButton = {
-      FloatingActionButton(
-        onClick = {
-          // Guard against rapid repeated taps: only the first tap opens the picker.
-          if (isImportLauncherActive) return@FloatingActionButton
-          isImportLauncherActive = true
-          // Show a hint that only `.litertlm` files are accepted. `showSnackbar` suspends until the
-          // snackbar is dismissed, so it must run in its own coroutine and NOT gate the picker.
-          scope.launch {
-            snackbarHostState.showSnackbar(
-              context.getString(R.string.import_model_hint_message)
-            )
-          }
-          // Open the SAF picker (filtered to octet-stream, which is how the system classifies
-          // .litertlm files) after a short delay. The picker callback still validates the
-          // file-name extension as the final gate.
-          scope.launch {
-            delay(SNACKBAR_HINT_DELAY_MS)
-            isImportLauncherActive = false
-            filePickerLauncher.launch(arrayOf("application/octet-stream"))
-          }
-        },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+      Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
       ) {
-        Icon(
-          Icons.AutoMirrored.Outlined.NoteAdd,
-          contentDescription = stringResource(R.string.cd_import_model_button),
-        )
+        // While a model is being served by the local API server, offer a quick way back to its API
+        // page from the bottom of the home page.
+        if (showReturnToApiServer) {
+          ExtendedFloatingActionButton(
+            onClick = onReturnToApiServer,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+          ) {
+            Icon(
+              Icons.Outlined.Dns,
+              contentDescription = null,
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(stringResource(R.string.home_return_to_api_server))
+          }
+        }
+        FloatingActionButton(
+          onClick = {
+            // Guard against rapid repeated taps: only the first tap opens the picker.
+            if (isImportLauncherActive) return@FloatingActionButton
+            isImportLauncherActive = true
+            // Show a hint that only `.litertlm` files are accepted. `showSnackbar` suspends until
+            // the snackbar is dismissed, so it must run in its own coroutine and NOT gate the
+            // picker.
+            scope.launch {
+              snackbarHostState.showSnackbar(
+                context.getString(R.string.import_model_hint_message)
+              )
+            }
+            // Open the SAF picker (filtered to octet-stream, which is how the system classifies
+            // .litertlm files) after a short delay. The picker callback still validates the
+            // file-name extension as the final gate.
+            scope.launch {
+              delay(SNACKBAR_HINT_DELAY_MS)
+              isImportLauncherActive = false
+              filePickerLauncher.launch(arrayOf("application/octet-stream"))
+            }
+          },
+          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+          contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ) {
+          Icon(
+            Icons.AutoMirrored.Outlined.NoteAdd,
+            contentDescription = stringResource(R.string.cd_import_model_button),
+          )
+        }
       }
     },
     snackbarHost = { SnackbarHost(hostState = snackbarHostState) },

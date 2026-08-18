@@ -23,6 +23,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 /**
@@ -50,12 +51,21 @@ constructor(
   val activeModelName: StateFlow<String?> = _activeModelName.asStateFlow()
 
   init {
-    // Recover live state from the singleton server so a freshly created ViewModel (e.g. after
-    // navigating back into the API page) still reflects a server that kept running in the
-    // background.
-    if (server.isRunning) {
-      _baseUrl.value = server.currentBaseUrl()
-      _activeModelName.value = server.getActiveModelName()?.removeSuffix(".litertlm")
+    // Mirror the singleton server's live state so a freshly created ViewModel (e.g. on the home
+    // page, or after navigating back into the API page) reflects a server that kept running in the
+    // background — and keeps updating as the server starts/stops. Because the server is a singleton
+    // while each screen owns its own ViewModel instance, observing runState keeps every instance in
+    // sync with the actual server regardless of when it was created.
+    viewModelScope.launch {
+      server.runState.collect { running ->
+        _isRunning.value = running
+        if (running) {
+          _baseUrl.value = server.currentBaseUrl()
+          _activeModelName.value = server.getActiveModelName()?.removeSuffix(".litertlm")
+        } else {
+          _activeModelName.value = null
+        }
+      }
     }
   }
 

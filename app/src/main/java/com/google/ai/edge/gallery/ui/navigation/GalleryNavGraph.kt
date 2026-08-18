@@ -88,7 +88,6 @@ fun GalleryNavHost(
 ) {
   val lifecycleOwner = LocalLifecycleOwner.current
   val modelManagerUiState by modelManagerViewModel.uiState.collectAsState()
-  val apiServerViewModel: ApiServerViewModel = hiltViewModel()
 
   // Track whether app is in foreground.
   DisposableEffect(lifecycleOwner) {
@@ -121,6 +120,11 @@ fun GalleryNavHost(
   ) {
     // Home: model download list.
     composable(route = ROUTE_HOMESCREEN) {
+      // Observe the local API server so the home page can show a "back to API" affordance while a
+      // model is being served, letting the user return to the API page of that model.
+      val apiServerViewModel: ApiServerViewModel = hiltViewModel()
+      val apiRunning by apiServerViewModel.isRunning.collectAsState()
+      val apiModelName by apiServerViewModel.activeModelName.collectAsState()
       ModelDownloadHome(
         modelManagerViewModel = modelManagerViewModel,
         onModelSelected = { model ->
@@ -136,6 +140,20 @@ fun GalleryNavHost(
             }
           if (model != null) {
             navController.navigate("$ROUTE_MODEL/${BuiltInTaskId.LLM_CHAT}/${model.name}")
+          }
+        },
+        showReturnToApiServer = apiRunning,
+        onReturnToApiServer = {
+          // Navigate back to the API page of the model currently being served. Match by display
+          // name (what the server advertises) or by the internal name.
+          val servedModel =
+            modelManagerViewModel.allowlistModels.firstOrNull {
+              it.displayName == apiModelName || it.name == apiModelName
+            } ?: modelManagerViewModel.getAllModels().firstOrNull {
+              it.displayName == apiModelName || it.name == apiModelName
+            }
+          if (servedModel != null) {
+            navController.navigate("$ROUTE_MODEL/${BuiltInTaskId.LLM_CHAT}/${servedModel.name}")
           }
         },
       )
@@ -183,11 +201,11 @@ fun GalleryNavHost(
               } else {
                 navController.navigateUp()
 
-                // Clean up models that are no longer needed, but keep the model currently being
-                // served by the local API server alive.
-                val servedModelName = apiServerViewModel.activeModelName.value
+                // Clean up models that are no longer needed. The model currently being served by
+                // the local API server is kept online automatically by ModelManagerViewModel (it
+                // skips cleanup for a model the server is actively serving), so we do not have to
+                // special-case it here and the model stays available even after leaving the page.
                 for (curModel in customTask.task.models) {
-                  if (curModel.name == servedModelName) continue
                   val instanceToCleanUp = curModel.instance
                   scope.launch(Dispatchers.Default) {
                     modelManagerViewModel.cleanupModel(

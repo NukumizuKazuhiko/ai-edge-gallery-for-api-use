@@ -796,6 +796,7 @@
   <!-- Model download home page. -->
   <string name="home_subtitle" translatable="true" description="Subtitle under the app title on the model download home page. [CHAR_LIMIT=30]">Model downloads · Local API service</string>
   <string name="home_empty_model_list" translatable="true" description="Empty-state message on the model download home page telling the user to refresh or import a model. [CHAR_LIMIT=90]">No models available. Check your network and tap refresh in the top-right corner, or tap + in the bottom-right corner to import a local model.</string>
+  <string name="home_return_to_api_server" translatable="true" description="Label of the floating button shown on the home page while a model is being served, letting the user return to the API service page of that model. [CHAR_LIMIT=20]">Back to API</string>
 
   <!-- API server screen. -->
   <string name="api_server_current_model" translatable="true" description="Label for the currently selected model on the API server screen. [CHAR_LIMIT=15]">Current model</string>

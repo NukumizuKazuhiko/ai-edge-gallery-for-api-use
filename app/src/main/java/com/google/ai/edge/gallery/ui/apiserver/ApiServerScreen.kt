@@ -87,6 +87,7 @@ fun ApiServerScreen(
   val isRunning by apiServerViewModel.isRunning.collectAsState()
   val baseUrl by apiServerViewModel.baseUrl.collectAsState()
   val authToken by apiServerViewModel.authToken.collectAsState()
+  val activeModelName by apiServerViewModel.activeModelName.collectAsState()
   var tokenInput by remember { mutableStateOf("") }
 
   LaunchedEffect(Unit) {
@@ -94,10 +95,13 @@ fun ApiServerScreen(
     tokenInput = authToken.orEmpty()
   }
 
-  // If the user switches to another model while the server is running, stop the server so the
-  // exposed model always matches the one the user sees.
+  // If the user opens a different model while the server is running, stop the server so the
+  // exposed model matches the newly opened one. When the user opens the same model that is
+  // already being served (e.g. navigating back to the API page), the model is still online, so
+  // leave the server running and jump straight into the API page without re-initializing.
   LaunchedEffect(model.name) {
-    if (isRunning) {
+    val targetName = model.displayName.ifEmpty { model.name }
+    if (isRunning && activeModelName != null && activeModelName != targetName) {
       apiServerViewModel.stop()
     }
   }

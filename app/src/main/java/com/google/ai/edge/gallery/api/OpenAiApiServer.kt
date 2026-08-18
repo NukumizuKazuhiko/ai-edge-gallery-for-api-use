@@ -45,6 +45,9 @@ import java.net.NetworkInterface
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -108,6 +111,15 @@ constructor(
   val isRunning: Boolean
     get() = isAlive()
 
+  /**
+   * Observable running state, kept in sync with the actual HTTP server. Screens observe this (via
+   * [com.google.ai.edge.gallery.api.ApiServerViewModel]) so any ViewModel instance reflects the
+   * live server state, e.g. to show the "back to API" affordance on the home page while the server
+   * is running.
+   */
+  private val _runState = MutableStateFlow(isAlive())
+  val runState: StateFlow<Boolean> = _runState.asStateFlow()
+
   /** Enables/disables bearer-token auth for the /v1 endpoints. */
   fun setAuthToken(token: String?) {
     authToken = token?.takeIf { it.isNotBlank() }
@@ -123,6 +135,18 @@ constructor(
 
   /** The name of the model currently being served, or null if none was set. */
   fun getActiveModelName(): String? = activeModel?.name
+
+  /**
+   * True while the HTTP server is running and serving [modelName].
+   *
+   * Model instances are owned by the UI task scaffold, which normally cleans a model up when the
+   * user navigates away or switches models. When a model is actively served by the API server it
+   * must stay resident (its `instance` must not be torn down) so the server keeps answering calls
+   * even after the user leaves the API page. Callers that clean up models should consult this
+   * before tearing a model down.
+   */
+  fun isServingModel(modelName: String): Boolean =
+    isAlive() && activeModel?.name == modelName
 
   /**
    * The model name exposed to API clients, without the import file extension.
@@ -154,6 +178,7 @@ constructor(
       return null
     }
     Log.d(TAG, "OpenAI-compatible server started on port $port")
+    _runState.value = true
     // Keep the process alive: run the server inside a foreground service with a persistent
     // notification so it survives the screen being off or the app being backgrounded. Enable
     // independent keep-alive so the app stays resident even after the server stops (until the
@@ -181,6 +206,9 @@ constructor(
       }
       Log.d(TAG, "Server stopped")
     }
+    // Reflect the server state so observing ViewModels update their running/URL state. Emitted
+    // regardless of whether it was actually alive above.
+    _runState.value = false
     // Keep-alive stays on (until the process is killed), so re-trigger the foreground service so
     // it rebuilds its notification: with the server no longer running it switches to the
     // keep-alive-only message instead of the stale "serving" message. This also runs when the
