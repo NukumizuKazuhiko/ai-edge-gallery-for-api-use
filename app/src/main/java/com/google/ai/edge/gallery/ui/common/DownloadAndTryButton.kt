@@ -76,7 +76,10 @@ import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.data.Model
+import com.google.ai.edge.gallery.data.ModelDownloadSource
+import com.google.ai.edge.gallery.data.ModelDownloadSourceStore
 import com.google.ai.edge.gallery.data.ModelDownloadStatusType
+import com.google.ai.edge.gallery.data.ModelScopeUrlMapper
 import com.google.ai.edge.gallery.data.RuntimeType
 import com.google.ai.edge.gallery.data.Task
 import com.google.ai.edge.gallery.ui.common.tos.GemmaTermsOfUseDialog
@@ -259,8 +262,14 @@ fun DownloadAndTryButton(
     scope.launch(Dispatchers.IO) {
       if (needToDownloadFirst) {
         downloadStarted = true
+        // When the ModelScope (魔搭社区) source is selected and this model is mirrored there,
+        // download it directly. ModelScope URLs need no auth, and probing the original Hugging
+        // Face URL first would fail on networks that cannot reach huggingface.co directly.
+        val usingModelScopeSource =
+          ModelDownloadSourceStore.get(context) == ModelDownloadSource.MODELSCOPE &&
+            ModelScopeUrlMapper.resolveModelScopeUrl(model.name) != null
         // For HuggingFace urls
-        if (model.url.startsWith("https://huggingface.co")) {
+        if (!usingModelScopeSource && model.url.startsWith("https://huggingface.co")) {
           checkingToken = true
 
           // Check if the url needs auth.

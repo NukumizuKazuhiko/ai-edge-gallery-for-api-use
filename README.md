@@ -14,6 +14,8 @@
 - ⏳ **请求排队**：并发请求自动排队
 - 🛠️ **模型获取修复**：模型列表缓存优先加载 + HTTP 5 秒超时，断网/弱网下不卡死
 - ⚡ **保活设置**：通知权限、忽略电池优化、厂商电源管理白名单，避免后台被杀
+- 🌐 **下载源切换**：设置里可选择「原生直连（Hugging Face）」或「魔搭社区（ModelScope）」。切换到魔搭后，Gemma 4 E2B / E4B 模型从国内镜像 [venshell/gemma-4-it-litert-lm](https://www.modelscope.cn/models/venshell/gemma-4-it-litert-lm) 下载，无需科学上网；未镜像的模型自动回退到原生直连。
+- ⚡ **多线程分片下载**：魔搭源下将文件分成 4 段并行 Range 下载，实测速度约 26 MB/s（单连接约 1.7 MB/s），大幅减少掉速波动，下载体验接近原生直连。
 
 ## 致谢 / Acknowledgments
 

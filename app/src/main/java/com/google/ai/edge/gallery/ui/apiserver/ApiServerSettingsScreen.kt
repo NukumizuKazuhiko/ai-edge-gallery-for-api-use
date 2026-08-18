@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -43,6 +44,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -61,6 +63,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.google.ai.edge.gallery.data.ModelDownloadSource
+import com.google.ai.edge.gallery.data.ModelDownloadSourceStore
 
 /**
  * The keep-alive settings page.
@@ -91,6 +95,9 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
     rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
       refreshKeepAliveState()
     }
+
+  // --- Model download source ---
+  var downloadSource by remember { mutableStateOf(ModelDownloadSourceStore.get(context)) }
 
   LaunchedEffect(Unit) {
     refreshKeepAliveState()
@@ -137,6 +144,69 @@ fun ApiServerSettingsScreen(onBackClicked: () -> Unit) {
           .padding(16.dp),
       verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+      // --- Model download source ---
+      Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+          Text("下载源", style = MaterialTheme.typography.titleMedium)
+          Text(
+            "选择模型文件的下载来源。切换到「魔搭社区」可从国内镜像下载，速度更快；" +
+              "魔搭目前仅提供 Gemma 4 E2B / E4B 模型，其他模型会自动回退到原生直连。",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+          )
+
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .selectable(
+                  selected = downloadSource == ModelDownloadSource.HF,
+                  onClick = {
+                    downloadSource = ModelDownloadSource.HF
+                    ModelDownloadSourceStore.set(context, ModelDownloadSource.HF)
+                  },
+                )
+                .padding(vertical = 4.dp),
+          ) {
+            RadioButton(
+              selected = downloadSource == ModelDownloadSource.HF,
+              onClick = {
+                downloadSource = ModelDownloadSource.HF
+                ModelDownloadSourceStore.set(context, ModelDownloadSource.HF)
+              },
+            )
+            Text("原生直连（Hugging Face）", style = MaterialTheme.typography.bodyMedium)
+          }
+
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier =
+              Modifier
+                .fillMaxWidth()
+                .selectable(
+                  selected = downloadSource == ModelDownloadSource.MODELSCOPE,
+                  onClick = {
+                    downloadSource = ModelDownloadSource.MODELSCOPE
+                    ModelDownloadSourceStore.set(context, ModelDownloadSource.MODELSCOPE)
+                  },
+                )
+                .padding(vertical = 4.dp),
+          ) {
+            RadioButton(
+              selected = downloadSource == ModelDownloadSource.MODELSCOPE,
+              onClick = {
+                downloadSource = ModelDownloadSource.MODELSCOPE
+                ModelDownloadSourceStore.set(context, ModelDownloadSource.MODELSCOPE)
+              },
+            )
+            Text("魔搭社区（ModelScope）", style = MaterialTheme.typography.bodyMedium)
+          }
+        }
+      }
+
       // --- Keep-alive ---
       Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
