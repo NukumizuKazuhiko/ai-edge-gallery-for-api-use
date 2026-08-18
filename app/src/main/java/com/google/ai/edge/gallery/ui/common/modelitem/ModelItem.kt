@@ -150,7 +150,9 @@ fun ModelItem(
           val isWebImport = model.imported && model.url.isNotEmpty()
           if (
             modelVariants.isEmpty() &&
-              (downloadStatus?.status == ModelDownloadStatusType.SUCCEEDED || isWebImport)
+              (downloadStatus?.status == ModelDownloadStatusType.SUCCEEDED ||
+                isWebImport ||
+                model.imported)
           ) {
             ModelItemActionMenu(
               model = model,

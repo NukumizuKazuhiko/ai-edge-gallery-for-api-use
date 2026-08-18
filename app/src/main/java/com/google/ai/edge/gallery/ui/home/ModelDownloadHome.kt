@@ -126,6 +126,18 @@ fun ModelDownloadHome(
         .filter { it.imported && it.isLlm && it.parentModelName.isNullOrEmpty() }
     }
 
+  // Models usable right now, regardless of source: allowlist models that have finished
+  // downloading plus all imported models. These are grouped together in a dedicated section at
+  // the top of the home page so the user can reach runnable models without scrolling.
+  val availableModels =
+    remember(uiState.modelDownloadStatus, uiState.modelImportingUpdateTrigger) {
+      val downloadedNames =
+        uiState.modelDownloadStatus
+          .filterValues { it.status == ModelDownloadStatusType.SUCCEEDED }
+          .keys
+      models.filter { downloadedNames.contains(it.name) } + importedModels
+    }
+
   // Group variants (models sharing a parentModelName) under their top-level model.
   val modelVariants by
     remember(uiState.modelImportingUpdateTrigger) {
@@ -275,6 +287,40 @@ fun ModelDownloadHome(
           contentPadding =
             PaddingValues(top = 16.dp, bottom = innerPadding.calculateBottomPadding() + 96.dp),
         ) {
+          if (availableModels.isNotEmpty()) {
+            item(key = "available_models_label") {
+              Text(
+                stringResource(R.string.model_list_available_models_title),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(horizontal = 16.dp).padding(top = 24.dp, bottom = 8.dp),
+              )
+            }
+          }
+          items(availableModels, key = { "available_${it.name}" }) { model ->
+            ModelItem(
+              model = model,
+              task = null,
+              modelManagerViewModel = modelManagerViewModel,
+              onModelClicked = { onModelSelected(model) },
+              onBenchmarkClicked = {},
+              expanded = true,
+              showBenchmarkButton = false,
+              showDeleteButton = true,
+              modelVariants = modelVariants.getOrDefault(model.name, listOf()),
+            )
+          }
+
+          if (models.isNotEmpty()) {
+            item(key = "models_label") {
+              Text(
+                stringResource(R.string.model_list_recommended_models_title),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.padding(horizontal = 16.dp).padding(top = 24.dp, bottom = 8.dp),
+              )
+            }
+          }
           items(models, key = { it.name }) { model ->
             val isDownloaded =
               uiState.modelDownloadStatus[model.name]?.status == ModelDownloadStatusType.SUCCEEDED
@@ -289,29 +335,6 @@ fun ModelDownloadHome(
               showDeleteButton = true,
               onExpanded = { expandedStates[model.name] = it },
               modelVariants = modelVariants.getOrDefault(model.name, listOf()),
-            )
-          }
-
-          if (importedModels.isNotEmpty()) {
-            item(key = "imported_models_label") {
-              Text(
-                stringResource(R.string.model_list_imported_models_title),
-                color = MaterialTheme.colorScheme.onSurface,
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.padding(horizontal = 16.dp).padding(top = 24.dp, bottom = 8.dp),
-              )
-            }
-          }
-          items(importedModels, key = { it.name }) { model ->
-            ModelItem(
-              model = model,
-              task = null,
-              modelManagerViewModel = modelManagerViewModel,
-              onModelClicked = { onModelSelected(model) },
-              onBenchmarkClicked = {},
-              expanded = true,
-              showBenchmarkButton = false,
-              showDeleteButton = true,
             )
           }
         }

@@ -1363,6 +1363,7 @@ constructor(
     val model =
       Model(
         name = info.fileName,
+        displayName = info.fileName.removeSuffix(".litertlm"),
         url = info.url,
         configs = configs,
         sizeInBytes = info.fileSize,
