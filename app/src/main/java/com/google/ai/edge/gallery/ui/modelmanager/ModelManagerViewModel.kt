@@ -226,12 +226,14 @@ constructor(
   init {
     // Keep the local OpenAI-compatible API server's model list in sync with the app's model
     // library automatically: any change to the model library (allowlist refresh, download,
-    // delete) flows through `_uiState` and is mirrored into the server registry. The allowlist
-    // (not the task list) is the source of truth so models of every task type are advertised.
+    // import, delete) flows through `_uiState` and is mirrored into the server registry. The
+    // allowlist is the source of truth for built-in models (so models registered only for
+    // disabled task types are still advertised); imported models are merged in from the task
+    // model lists since they do not belong to the allowlist.
     viewModelScope.launch {
       _uiState.collect { state ->
         val availableModels =
-          _allowlistModels
+          (_allowlistModels + state.tasks.flatMap { it.models }.filter { it.imported })
             .distinctBy { it.name }
             .filter {
               state.modelDownloadStatus[it.name]?.status == ModelDownloadStatusType.SUCCEEDED &&

@@ -412,7 +412,7 @@
   <string name="hugging_face_url_placeholder" description="Placeholder text shown inside the text field where the user enters the URL. [CHAR_LIMIT=26]">https://huggingface.co/…</string>
   <string name="next" translatable="true" description="Button text to navigate to the next step. [CHAR_LIMIT=6]">Next</string>
   <string name="unsupported_model_title" translatable="true" description="Title of the dialog showing that the imported model type is unsupported. [CHAR_LIMIT=24]">Unsupported model type</string>
-  <string name="unsupported_file_type_error" translatable="true" description="Message informing the user that only .task or .litertlm file formats are supported. [CHAR_LIMIT=53]">Only \".task\" or \".litertlm\" file type is supported.</string>
+  <string name="unsupported_file_type_error" translatable="true" description="Message informing the user that only .litertlm file format is supported. [CHAR_LIMIT=53]">Only \".litertlm\" file type is supported.</string>
   <string name="unsupported_web_model_error" translatable="true" description="Message explaining that the model is only for web browsers and not supported on the Android application. [CHAR_LIMIT=75]">Looks like the model is a web-only model and is not supported by the app.</string>
   <string name="file_too_large_warning" translatable="true" description="Warning label when a model file size exceeds device memory limit. [CHAR_LIMIT=100]">Likely too large for device RAM</string>
   <string name="incompatible_device_warning" translatable="true" description="Warning label when a model file is incompatible with device hardware. [CHAR_LIMIT=100]">Likely incompatible with device hardware</string>
@@ -546,6 +546,10 @@
   <string name="error_internet_connection" translatable="true" description="Error message advising the user to check their internet connection. [CHAR_LIMIT=60]">Please check your internet connection and try again later.</string>
   <!-- Button label to retry model import. -->
   <string name="retry" translatable="true" description="Label for a button to retry a failed operation (e.g., reloading data). [CHAR_LIMIT=7]">Retry</string>
+  <!-- Snackbar hint shown when the user taps the import button, before the file picker opens. -->
+  <string name="import_model_hint_message" translatable="true" description="Hint telling the user that only .litertlm model files can be imported. [CHAR_LIMIT=30]">请上传 .litertlm 格式的模型文件</string>
+  <!-- Snackbar message shown after a model has been imported successfully. -->
+  <string name="model_imported_success" translatable="true" description="Message shown when a model file has been imported successfully. [CHAR_LIMIT=18]">模型导入成功</string>
   <!-- Title of the theme selection setting. -->
   <string name="theme_title" translatable="true" description="Label for the settings section or configuration key where users can choose the visual theme of the app (e.g., Light, Dark). [CHAR_LIMIT=7]">Theme</string>
   <!-- Title of the section for third-party libraries in settings. -->

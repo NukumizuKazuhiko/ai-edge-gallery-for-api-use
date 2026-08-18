@@ -424,3 +424,25 @@ fun convertStringToJsonObject(jsonString: String): JsonObject {
     JsonObject()
   }
 }
+
+/** Replaces characters that are invalid in a file name with an underscore. */
+fun ensureValidFileName(fileName: String): String {
+  return fileName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
+}
+
+/** Formats a byte count into a human-readable size string (e.g. "1.5 GB"). */
+fun Long.humanReadableSize(): String {
+  if (this <= 0) return "0 B"
+  val units = listOf("B", "KB", "MB", "GB", "TB")
+  var value = this.toDouble()
+  var unitIndex = 0
+  while (value >= 1024.0 && unitIndex < units.size - 1) {
+    value /= 1024.0
+    unitIndex++
+  }
+  return if (unitIndex == 0) {
+    "$this ${units[unitIndex]}"
+  } else {
+    String.format("%.1f %s", value, units[unitIndex])
+  }
+}

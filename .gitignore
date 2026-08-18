@@ -29,6 +29,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin
 
 # Local workspace artifacts not part of this repo's release source.
 /mcp/
