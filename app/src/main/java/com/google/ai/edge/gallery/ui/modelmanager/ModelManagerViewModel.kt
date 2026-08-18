@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.google.ai.edge.gallery.AppLifecycleProvider
 import com.google.ai.edge.gallery.BuildConfig
 import com.google.ai.edge.gallery.R
-import com.google.ai.edge.gallery.api.ApiModelRegistry
 import com.google.ai.edge.gallery.common.ProjectConfig
 import com.google.ai.edge.gallery.common.SystemPromptHelper
 import com.google.ai.edge.gallery.common.getJsonResponse
@@ -207,7 +206,6 @@ constructor(
   private val customTasks: Set<@JvmSuppressWildcards CustomTask>,
   private val systemPromptRepository: SystemPromptRepository,
   private val huggingFaceApiClient: HuggingFaceApiClient,
-  private val apiModelRegistry: ApiModelRegistry,
   @ApplicationContext private val context: Context,
 ) :
   ViewModel()
@@ -217,32 +215,9 @@ constructor(
   protected val _uiState = MutableStateFlow(createEmptyUiState())
   open val uiState = _uiState.asStateFlow()
 
-  // Must be declared before the `init` block below (which collects the allowlist), because Kotlin
-  // runs field initializers in declaration order.
   private var _allowlistModels: MutableList<Model> = mutableListOf()
   val allowlistModels: List<Model>
     get() = _allowlistModels
-
-  init {
-    // Keep the local OpenAI-compatible API server's model list in sync with the app's model
-    // library automatically: any change to the model library (allowlist refresh, download,
-    // import, delete) flows through `_uiState` and is mirrored into the server registry. The
-    // allowlist is the source of truth for built-in models (so models registered only for
-    // disabled task types are still advertised); imported models are merged in from the task
-    // model lists since they do not belong to the allowlist.
-    viewModelScope.launch {
-      _uiState.collect { state ->
-        val availableModels =
-          (_allowlistModels + state.tasks.flatMap { it.models }.filter { it.imported })
-            .distinctBy { it.name }
-            .filter {
-              state.modelDownloadStatus[it.name]?.status == ModelDownloadStatusType.SUCCEEDED &&
-                it.isLlm
-            }
-        apiModelRegistry.updateModels(availableModels)
-      }
-    }
-  }
 
   fun fetchModelDetails(modelId: String, onResult: (HfModelItemProto?) -> Unit) {
     viewModelScope.launch {

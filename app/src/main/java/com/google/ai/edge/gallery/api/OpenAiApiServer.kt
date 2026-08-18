@@ -164,18 +164,19 @@ constructor(
     // Independent keep-alive stays on after the server stops (until the process is killed), so the
     // foreground service keeps the app resident and the local API reachable without a cold start.
     // We therefore do NOT tear down the keep-alive service here.
-    if (!isAlive()) {
-      return
+    if (isAlive()) {
+      try {
+        super.stop()
+      } catch (e: Exception) {
+        Log.w(TAG, "Error stopping server", e)
+      }
+      Log.d(TAG, "Server stopped")
     }
-    try {
-      super.stop()
-    } catch (e: Exception) {
-      Log.w(TAG, "Error stopping server", e)
-    }
-    Log.d(TAG, "Server stopped")
     // Keep-alive stays on (until the process is killed), so re-trigger the foreground service so
     // it rebuilds its notification: with the server no longer running it switches to the
-    // keep-alive-only message instead of the stale "serving" message.
+    // keep-alive-only message instead of the stale "serving" message. This also runs when the
+    // server died unexpectedly (isAlive() is false), so the notification never keeps showing a
+    // stale "serving" state after the server is gone.
     ApiServerService.start(context, null)
   }
 

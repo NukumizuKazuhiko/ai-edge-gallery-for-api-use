@@ -725,10 +725,10 @@
   <string name="task_label_audio_scribe" translatable="false">Audio Scribe</string>
   <string name="task_label_tiny_garden" translatable="false">Tiny Garden</string>
   <string name="task_label_agent_skills" translatable="false">Agent Skills</string>
-  <!-- Description for the AI Chat task. [CHAR_LIMIT=100] -->
-  <string name="task_desc_ai_chat" translatable="true" description="Description for the AI Chat task.">Chat with on-device large language models</string>
-  <!-- Short description for the AI Chat task. [CHAR_LIMIT=35] -->
-  <string name="task_short_desc_ai_chat" translatable="true" description="Short description for the AI Chat task.">Chat with an on-device LLM</string><!-- Description for the Ask Image task. [CHAR_LIMIT=100] -->
+  <!-- Description for the API service task. [CHAR_LIMIT=100] -->
+  <string name="task_desc_api_service" translatable="true" description="Description for the API service task.">Run a local OpenAI-compatible API server on this device</string>
+  <!-- Short description for the API service task. [CHAR_LIMIT=35] -->
+  <string name="task_short_desc_api_service" translatable="true" description="Short description for the API service task.">Local OpenAI-compatible API</string><!-- Description for the Ask Image task. [CHAR_LIMIT=100] -->
   <string name="task_desc_ask_image" translatable="true" description="Description for the Ask Image task.">Ask questions about images with on-device large language models</string>
   <!-- Short description for the Ask Image task. [CHAR_LIMIT=35] -->
   <string name="task_short_desc_ask_image" translatable="true" description="Short description for the Ask Image task.">Ask questions about images</string><!-- Description for the Audio Scribe task. [CHAR_LIMIT=100] -->

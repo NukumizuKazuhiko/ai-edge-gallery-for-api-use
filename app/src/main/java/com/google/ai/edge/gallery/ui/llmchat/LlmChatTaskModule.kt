@@ -60,8 +60,8 @@ constructor(
       category = Category.LLM,
       icon = Icons.Outlined.Dns,
       models = mutableListOf(),
-      description = context.getString(R.string.task_desc_ai_chat),
-      shortDescription = context.getString(R.string.task_short_desc_ai_chat),
+      description = context.getString(R.string.task_desc_api_service),
+      shortDescription = context.getString(R.string.task_short_desc_api_service),
       docUrl = "https://github.com/google-ai-edge/LiteRT-LM/blob/main/kotlin/README.md",
       sourceCodeUrl =
         "https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/ui/llmchat/LlmChatModelHelper.kt",
