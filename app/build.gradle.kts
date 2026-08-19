@@ -52,6 +52,23 @@ android {
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
 
+  flavorDimensions += "device"
+
+  productFlavors {
+    // Standard build: targets current Android (minSdk 31 / Android 12+).
+    create("standard") {
+      dimension = "device"
+    }
+    // Legacy build: lowers minSdk so the app can install on older devices
+    // (e.g. Android 10, which reports API 29). Built explicitly with the
+    // `legacyRelease` / `legacyDebug` task variants.
+    create("legacy") {
+      dimension = "device"
+      minSdk = 29
+      applicationIdSuffix = ".legacy"
+    }
+  }
+
   signingConfigs {
     create("release") {
       val propsFile = rootProject.file("local/keystore/keystore.properties")
