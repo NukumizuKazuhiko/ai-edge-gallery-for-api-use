@@ -164,6 +164,12 @@
   <string name="toast_open_battery_settings_failed" translatable="true">无法打开电池优化设置</string>
   <string name="toast_power_mgmt_not_found" translatable="true">未找到电源管理设置</string>
   <string name="toast_battery_behavior_not_found" translatable="true">未找到耗电行为设置</string>
+  <string name="settings_support_developer_title" translatable="true">支持开发者</string>
+  <string name="settings_support_developer_desc" translatable="true">觉得好用？在爱发电请开发者喝杯咖啡吧。</string>
+  <string name="settings_support_developer_open" translatable="true">打开爱发电</string>
+  <string name="settings_github_title" translatable="true">GitHub</string>
+  <string name="settings_github_project" translatable="true">项目仓库</string>
+  <string name="settings_github_profile" translatable="true">开发者主页</string>
 
   <!-- 语言选择（设置页） -->
   <string name="settings_language_title" translatable="true">语言</string>

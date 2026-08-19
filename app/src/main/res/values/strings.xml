@@ -839,6 +839,12 @@
   <string name="toast_open_battery_settings_failed" translatable="true" description="Toast shown when the battery-optimization settings cannot be opened. [CHAR_LIMIT=30]">Unable to open battery optimization settings</string>
   <string name="toast_power_mgmt_not_found" translatable="true" description="Toast shown when no vendor power-management settings entry is found. [CHAR_LIMIT=30]">Power management settings not found</string>
   <string name="toast_battery_behavior_not_found" translatable="true" description="Toast shown when no vendor battery-behavior settings entry is found. [CHAR_LIMIT=30]">Battery behavior settings not found</string>
+  <string name="settings_support_developer_title" translatable="true" description="Title of the support-the-developer (aifadian) section at the bottom of the settings page. [CHAR_LIMIT=18]">Support the developer</string>
+  <string name="settings_support_developer_desc" translatable="true" description="Description of the aifadian donation link section at the bottom of the settings page. [CHAR_LIMIT=60]">Enjoy the app? Buy me a coffee on aifadian.</string>
+  <string name="settings_support_developer_open" translatable="true" description="Label of the aifadian link row that opens the donation page in a browser. [CHAR_LIMIT=20]">Open aifadian</string>
+  <string name="settings_github_title" translatable="true" description="Title of the GitHub section at the bottom of the settings page. [CHAR_LIMIT=18]">GitHub</string>
+  <string name="settings_github_project" translatable="true" description="Label of the GitHub repository link row. [CHAR_LIMIT=30]">Project repository</string>
+  <string name="settings_github_profile" translatable="true" description="Label of the GitHub user profile link row. [CHAR_LIMIT=30]">Developer profile</string>
 
   <!-- App language selection (settings page). -->
   <string name="settings_language_title" translatable="true" description="Title of the language-selection section in settings. [CHAR_LIMIT=12]">Language</string>
