@@ -23,7 +23,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.ai.edge.gallery.AppLifecycleProvider
-import com.google.ai.edge.gallery.BuildConfig
 import com.google.ai.edge.gallery.R
 import com.google.ai.edge.gallery.api.OpenAiApiServer
 import com.google.ai.edge.gallery.common.ProjectConfig
@@ -91,8 +90,8 @@ private const val TAG = "AGModelManagerViewModel"
 private const val TEXT_INPUT_HISTORY_MAX_SIZE = 50
 private const val MODEL_ALLOWLIST_FILENAME = "model_allowlist.json"
 private const val MODEL_ALLOWLIST_TEST_FILENAME = "model_allowlist_test.json"
-private const val ALLOWLIST_BASE_URL =
-  "https://raw.githubusercontent.com/google-ai-edge/gallery/refs/heads/main/model_allowlists"
+private const val MODELSCOPE_ALLOWLIST_URL =
+  "https://modelscope.cn/models/venshell/gemma-4-it-litert-lm/resolve/master/model_allowlist.json"
 
 private const val TEST_MODEL_ALLOW_LIST = ""
 
@@ -1059,17 +1058,18 @@ constructor(
             return@launch
           }
 
-          // No cache: load from github.
-          var version = BuildConfig.VERSION_NAME.replace(".", "_")
-          val url = getAllowlistUrl(version)
-          Log.d(TAG, "Loading model allowlist from internet. Url: $url")
-          val data = getJsonResponse<ModelAllowlist>(url = url)
+          // No cache: load from ModelScope as the primary online source.
+          Log.d(TAG, "Loading model allowlist from ModelScope: $MODELSCOPE_ALLOWLIST_URL")
+          val data = getJsonResponse<ModelAllowlist>(url = MODELSCOPE_ALLOWLIST_URL)
           modelAllowlist = data?.jsonObj
 
           if (modelAllowlist == null) {
-            Log.w(TAG, "Failed to load model allowlist from internet.")
+            // ModelScope failed: fall back to built-in assets so the model list is
+            // always available, even completely offline.
+            Log.w(TAG, "Failed to load model allowlist from ModelScope, falling back to assets")
+            modelAllowlist = readModelAllowlistFromAssets()
           } else {
-            Log.d(TAG, "Done: loading model allowlist from internet")
+            Log.d(TAG, "Done: loading model allowlist from ModelScope")
             saveModelAllowlistToDisk(modelAllowlistContent = data?.textContent ?: "{}")
           }
         }
@@ -1212,16 +1212,14 @@ constructor(
    * place. Startup-only side effects (pending downloads, AICore status checks) are skipped.
    */
   private fun refreshModelAllowlistFromInternet() {
-    val version = BuildConfig.VERSION_NAME.replace(".", "_")
-    val url = getAllowlistUrl(version)
-    Log.d(TAG, "Refreshing model allowlist from internet. Url: $url")
-    val data = getJsonResponse<ModelAllowlist>(url = url)
+    Log.d(TAG, "Refreshing model allowlist from ModelScope. Url: $MODELSCOPE_ALLOWLIST_URL")
+    val data = getJsonResponse<ModelAllowlist>(url = MODELSCOPE_ALLOWLIST_URL)
     val newAllowlist = data?.jsonObj
     if (newAllowlist == null) {
       Log.w(TAG, "Background refresh failed, keeping cached model allowlist")
       return
     }
-    Log.d(TAG, "Done: refreshing model allowlist from internet")
+    Log.d(TAG, "Done: refreshing model allowlist from ModelScope")
     saveModelAllowlistToDisk(modelAllowlistContent = data?.textContent ?: "{}")
     processModelAllowlist(modelAllowlist = newAllowlist, runStartupTasks = false)
   }
@@ -1276,6 +1274,18 @@ constructor(
     }
 
     return null
+  }
+
+  private fun readModelAllowlistFromAssets(): ModelAllowlist? {
+    return try {
+      Log.d(TAG, "Reading model allowlist from assets")
+      val content = context.assets.open("model_allowlist.json").bufferedReader().use { it.readText() }
+      val gson = Gson()
+      gson.fromJson(content, ModelAllowlist::class.java)
+    } catch (e: Exception) {
+      Log.e(TAG, "Failed to read model allowlist from assets", e)
+      null
+    }
   }
 
   private fun isModelPartiallyDownloaded(model: Model): Boolean {
@@ -1677,8 +1687,4 @@ constructor(
 
     return downloadedFileExists || unzippedDirectoryExists
   }
-}
-
-private fun getAllowlistUrl(version: String): String {
-  return "$ALLOWLIST_BASE_URL/${version}.json"
 }
